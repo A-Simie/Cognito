@@ -97,8 +97,8 @@ export default function Settings() {
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Appearance</h2>
                                 <div className="space-y-4">
                                     <p className="text-sm text-gray-600 dark:text-gray-400">Choose your preferred theme</p>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        {(['light', 'dark', 'night-vision'] as const).map((t) => (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {(['light', 'dark'] as const).map((t) => (
                                             <button
                                                 key={t}
                                                 onClick={() => setTheme(t)}
@@ -112,11 +112,10 @@ export default function Settings() {
                                                 <div className={cn(
                                                     'w-full h-20 rounded-lg mb-3',
                                                     t === 'light' && 'bg-white border border-gray-200',
-                                                    t === 'dark' && 'bg-gray-800',
-                                                    t === 'night-vision' && 'bg-slate-900'
+                                                    t === 'dark' && 'bg-gray-800'
                                                 )} />
                                                 <span className="text-sm font-medium capitalize text-gray-900 dark:text-white">
-                                                    {t.replace('-', ' ')}
+                                                    {t}
                                                 </span>
                                             </button>
                                         ))}

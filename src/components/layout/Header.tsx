@@ -159,7 +159,7 @@ export function Header() {
                             <Avatar
                                 src={MOCK_USER.avatar}
                                 alt={MOCK_USER.name}
-                                size="md"
+                                size="sm"
                             />
                             <div>
                                 <p className="text-sm font-medium text-gray-900 dark:text-white">
