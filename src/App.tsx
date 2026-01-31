@@ -1,35 +1,54 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { SessionProvider } from '@/contexts/SessionContext';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { UserProvider } from '@/contexts/UserContext';
 import Landing from '@/pages/Landing';
 import Dashboard from '@/pages/Dashboard';
+import Signup from '@/pages/Signup';
+import Login from '@/pages/Login';
+import VerifyOtp from '@/pages/VerifyOtp';
+import ForgotPassword from '@/pages/ForgotPassword';
+import Classes from '@/pages/Classes';
+import Settings from '@/pages/Settings';
 import YouTubeTutor from '@/pages/YouTubeTutor';
 import PDFTutor from '@/pages/PDFTutor';
-import TeachMe from '@/pages/TeachMe';
 import QuizMode from '@/pages/QuizMode';
-import Login from '@/pages/Login';
-import Signup from '@/pages/Signup';
-import Classes from '@/pages/Classes';
+import TeachMe from '@/pages/TeachMe';
 import Community from '@/pages/Community';
-import Settings from '@/pages/Settings';
+import Privacy from '@/pages/Privacy';
+import Terms from '@/pages/Terms';
+import { getToken } from '@/lib/auth';
+
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+    const token = getToken();
+    return token ? <>{children}</> : <Navigate to="/login" />;
+}
 
 export default function App() {
     return (
-        <SessionProvider>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/youtube" element={<YouTubeTutor />} />
-                    <Route path="/pdf" element={<PDFTutor />} />
-                    <Route path="/teach-me" element={<TeachMe />} />
-                    <Route path="/quiz" element={<QuizMode />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/classes" element={<Classes />} />
-                    <Route path="/community" element={<Community />} />
-                    <Route path="/settings" element={<Settings />} />
-                </Routes>
-            </BrowserRouter>
-        </SessionProvider>
+        <ThemeProvider>
+            <UserProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<Landing />} />
+                        <Route path="/signup" element={<Signup />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/verify-otp" element={<VerifyOtp />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/privacy" element={<Privacy />} />
+                        <Route path="/terms" element={<Terms />} />
+
+                        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                        <Route path="/classes" element={<PrivateRoute><Classes /></PrivateRoute>} />
+                        <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+
+                        <Route path="/youtube" element={<PrivateRoute><YouTubeTutor /></PrivateRoute>} />
+                        <Route path="/pdf" element={<PrivateRoute><PDFTutor /></PrivateRoute>} />
+                        <Route path="/quiz" element={<PrivateRoute><QuizMode /></PrivateRoute>} />
+                        <Route path="/teach-me/*" element={<PrivateRoute><TeachMe /></PrivateRoute>} />
+                        <Route path="/community" element={<PrivateRoute><Community /></PrivateRoute>} />
+                    </Routes>
+                </BrowserRouter>
+            </UserProvider>
+        </ThemeProvider>
     );
 }

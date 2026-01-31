@@ -1,23 +1,21 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Bell, GraduationCap, Menu, X } from 'lucide-react';
+import { GraduationCap, Menu, X } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
-import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
-import { MOCK_USER } from '@/lib/constants';
+import { useUser } from '@/contexts/UserContext';
 
 const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/classes', label: 'My Classes' },
-    { href: '/community', label: 'Community' },
     { href: '/settings', label: 'Settings' },
 ];
 
 export function Header() {
     const location = useLocation();
-    const [hasNotifications] = useState(true);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { user } = useUser(); // Use context instead of API call
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -33,11 +31,7 @@ export function Header() {
                             className="md:hidden p-2 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
                             aria-label="Toggle menu"
                         >
-                            {isMobileMenuOpen ? (
-                                <X className="w-6 h-6" />
-                            ) : (
-                                <Menu className="w-6 h-6" />
-                            )}
+                            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
 
                         <Link to="/" className="flex items-center gap-3">
@@ -71,26 +65,11 @@ export function Header() {
                     </div>
 
                     <div className="flex items-center gap-4 md:gap-6">
-                        <div className="hidden lg:block w-64">
-                            <Input
-                                placeholder="Search topics..."
-                                icon={<Search className="w-5 h-5" />}
-                                className="bg-gray-100 dark:bg-white/5"
-                            />
-                        </div>
-
                         <ThemeToggle />
 
-                        <button className="relative p-2 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors">
-                            <Bell className="w-5 h-5" />
-                            {hasNotifications && (
-                                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark" />
-                            )}
-                        </button>
-
                         <Avatar
-                            src={MOCK_USER.avatar}
-                            alt={MOCK_USER.name}
+                            src={user?.profilePicture} // Base64 or URL
+                            alt={user?.fullName || 'User'}
                             size="sm"
                             className="cursor-pointer hidden sm:block"
                         />
@@ -157,16 +136,16 @@ export function Header() {
                     <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
                         <div className="flex items-center gap-3">
                             <Avatar
-                                src={MOCK_USER.avatar}
-                                alt={MOCK_USER.name}
+                                src={user?.profilePicture}
+                                alt={user?.fullName || 'User'}
                                 size="sm"
                             />
                             <div>
                                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                    {MOCK_USER.name}
+                                    {user?.fullName || 'Loading...'}
                                 </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {MOCK_USER.email}
+                                    {user?.email}
                                 </p>
                             </div>
                         </div>

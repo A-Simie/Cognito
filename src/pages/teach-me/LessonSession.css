@@ -1,0 +1,146 @@
+.lesson-session-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #1a1b26;
+}
+
+/* Header */
+.lesson-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    background: #1a1b26;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-dot.connected {
+    background: #4ade80;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+}
+
+.status-dot.disconnected {
+    background: #ef4444;
+}
+
+/* Main Layout */
+.lesson-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sandbox Panel - 70% */
+.sandbox-panel {
+    flex: 0 0 70%;
+    background: #ffffff;
+    overflow: auto;
+    position: relative;
+}
+
+.sandbox-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.sandbox-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Ajibade Panel - 30% */
+.ajibade-panel {
+    flex: 0 0 30%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow-y: auto;
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+    .lesson-layout {
+        flex-direction: column;
+    }
+
+    .sandbox-panel {
+        flex: 0 0 60%;
+    }
+
+    .ajibade-panel {
+        flex: 0 0 40%;
+    }
+}
+
+/* Tablet Layout */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sandbox-panel {
+        flex: 0 0 65%;
+    }
+
+    .ajibade-panel {
+        flex: 0 0 35%;
+    }
+}

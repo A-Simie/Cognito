@@ -1,11 +1,22 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Play, Upload, MessageCircle, Check, Clock, Flame, TrendingUp, ChevronRight } from 'lucide-react';
+import { Play, Upload, MessageCircle, Check, Clock, Flame, ChevronRight } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { StatsCard, RecentActivity } from '@/components/shared';
-import { MOCK_USER } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { auth, learning } from '@/lib/api'; // Added 'auth' import
+import { useUser } from '@/contexts/UserContext';
+
+// Utility to format minutes (backend Long) into "5h 30m"
+const formatTime = (minutes: number) => {
+    if (!minutes) return '0h';
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${h}h${m > 0 ? ` ${m}m` : ''}`;
+};
 
 const LEARNING_MODES = [
     {
@@ -37,47 +48,12 @@ const LEARNING_MODES = [
         title: 'Teach Me',
         description: 'Get step-by-step explanations on any topic from an AI instructor.',
         icon: MessageCircle,
-        href: '/teach-me',
+        href: '/teach-me/topic',
         buttonText: 'Start Session',
         gradient: 'from-orange-500/10 to-yellow-500/10',
         hoverBorder: 'hover:border-orange-200',
         iconBg: 'from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20',
         iconColor: 'text-orange-500',
-    },
-];
-
-const RECENT_SESSIONS = [
-    {
-        id: '1',
-        title: 'Intro to Calculus',
-        type: 'Video' as const,
-        thumbnail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYpI-ldrmCENIk-urdRj6V_Za8Cyilcr_3Zc-G82QVJXFHbWQ1hgra2PZhd7Q7ZGbf9kQTPPLhJml5sqdLLwJvYhCoejs0MgAKT_pOKUpgl943Wpab_4Lsn7A4gKp9O-0bcYiRiDECErzY4eaB7NINoCq9nB_dTqhFMyRZk2HrUM6xfmB3uKmuWy68kOJe-cHdL6Hu5Fz0TDVpbn9ibhfe1WhD0WJrc3XcoI6FW1v0WTMJi7WKI5HFY93gYGSIpvcj9D2QUwc6zFqH',
-        progress: 80,
-        timeAgo: '2 hours ago',
-    },
-    {
-        id: '2',
-        title: 'French Revolution History',
-        type: 'PDF' as const,
-        thumbnail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCXZGpoLUrwSWpo_aEeExt9ewVS3iuQFGWxq9IMrV2ieWAQ73aO7qjXw8RHSJgl3rIns7pjWdjENowhmacjnkvyB1hvNvCu_LFbvErSA7m0uWl5dNvS54TFAZuTJN3Cbu-41Ip4TFwx4c-xPj-niBdNR90_4nvDmzsiah0etdQLRGasdPxvq33s7UeJySEi0Ll_2NaM7nO_WrYRQciwepc3b3qlVlkLcRC1RUdl58grdLsyl-vqdfHW1i_oCUMEdSrB2yIrTP1iSMAl',
-        progress: 45,
-        timeAgo: 'Yesterday',
-    },
-    {
-        id: '3',
-        title: 'Organic Chemistry Basics',
-        type: 'Quiz' as const,
-        thumbnail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBl9Yp2X2OXLml8izb9bAFuzep4ZWCEwrcaz3Ak3FD28_Yj6Z4aESydBBIwDtxQ_PzFYrzAM2vrarDTLQdssOLAMJV7uTdmRrnxAoevVInxrmrKRzFYxVV2M4OAcWidDfzBX6GXJh5v8zQt33sOnyRn2hteffVTaO9egqh9tCTni6k0s02VYuv_3wu2OduYjFx3bPYYWYsm_T9b3t0pxWNGcQxb8X5vzYS_dEgh2JAzhJC5SsGty1WIPROuQteWxr3XJD9a3xvTJWEg',
-        progress: 0,
-        timeAgo: '2 days ago',
-    },
-    {
-        id: '4',
-        title: 'Python Programming',
-        type: 'Video' as const,
-        thumbnail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPcSEpVzhKAEySJ5qglO_aC09yS9M9tNsB1f3ckBHFNJd3Dsd1v740S9vfVrs_DLvw7p4WNILZbGVOOJgCfJEntrq7W-HQ9_i3eZgJJ9fE3-0lASJiwJD38jCu56I5HOlzZBUiBmGW7ey-tSal-mcQZh4t1mdKWT-kL2DGg0d7TZd6-4xT53cAiDMjGdm_rGZXbEpFzSxRrvsZC6isaFfqcRWLNrpQXZPzYADUCEON1V5PR8SyicHW5mWpdhXSbCkcD0I9OQ0GtSAe',
-        progress: 100,
-        timeAgo: '3 days ago',
     },
 ];
 
@@ -95,6 +71,50 @@ const itemVariants = {
 };
 
 export default function Dashboard() {
+    const { user, refreshUser } = useUser(); // Use context
+    const [recentActivity, setRecentActivity] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showGoalPrompt, setShowGoalPrompt] = useState(false);
+    const [goalInput, setGoalInput] = useState('');
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const loadData = async () => {
+        try {
+            const activity = await learning.getRecentActivity().catch(() => []);
+            setRecentActivity(activity);
+            // Check if stats.weeklyGoalHours is missing
+            if (user && !user.stats?.weeklyGoalHours) {
+                setShowGoalPrompt(true);
+            }
+        } catch (e) {
+            console.error("Failed to load data", e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoalSubmit = async () => {
+        if (!goalInput) return;
+        try {
+            await auth.updateProfile({ weeklyGoalHours: parseInt(goalInput) });
+            setShowGoalPrompt(false);
+            await refreshUser(); // Refresh user profile to update stats
+            loadData(); // Refresh to update UI
+        } catch (e) {
+            console.error("Failed to save goal", e);
+        }
+    };
+
+    if (loading) return <div className="p-10 text-center">Loading...</div>;
+
+    const stats = user?.stats || {};
+    const weeklyGoalHours = stats.weeklyGoalHours || 1; // Avoid div/0
+    const currentHours = Math.floor((stats.totalMinutesSpent || 0) / 60);
+    const goalProgress = Math.min(100, Math.round((currentHours / weeklyGoalHours) * 100));
+
     return (
         <AppLayout>
             <motion.div
@@ -114,21 +134,20 @@ export default function Dashboard() {
                             <div className="space-y-2">
                                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 text-xs font-bold uppercase tracking-wider mb-2">
                                     <Flame className="w-4 h-4" />
-                                    <span>12 Day Streak</span>
+                                    <span>{stats.currentStreak || 0} Day Streak</span>
                                 </div>
                                 <h1 className="text-3xl md:text-4xl font-bold leading-tight">
-                                    Welcome back, {MOCK_USER.name}!
+                                    Welcome back, {user?.fullName}!
                                 </h1>
                                 <p className="text-purple-100 max-w-md text-sm md:text-base opacity-90">
-                                    Ready to continue your learning journey? You have 3 pending tasks for
-                                    today.
+                                    Ready to continue your learning journey?
                                 </p>
                             </div>
                             <div className="flex-shrink-0">
                                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex flex-col items-center justify-center min-w-[120px]">
-                                    <span className="text-3xl font-bold">85%</span>
+                                    <span className="text-3xl font-bold">{goalProgress}%</span>
                                     <span className="text-xs text-purple-100 uppercase tracking-wide">
-                                        Weekly Goal
+                                        Weekly Goal ({stats.weeklyGoalHours || '?'}h)
                                     </span>
                                 </div>
                             </div>
@@ -142,12 +161,6 @@ export default function Dashboard() {
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                             Choose Learning Mode
                         </h2>
-                        <a
-                            href="#"
-                            className="text-sm font-medium text-primary hover:text-primary/80 flex items-center gap-1"
-                        >
-                            View all <ChevronRight className="w-4 h-4" />
-                        </a>
                     </motion.div>
 
                     <motion.div
@@ -203,40 +216,51 @@ export default function Dashboard() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <StatsCard
                                 icon={<Check className="w-5 h-5" />}
-                                value={24}
+                                value={stats.lessonsCompleted || 0}
                                 label="Lessons Done"
                                 iconBgColor="bg-green-100 dark:bg-green-900/30"
                                 iconColor="text-green-600"
                             />
                             <StatsCard
                                 icon={<Clock className="w-5 h-5" />}
-                                value="12.5h"
+                                value={formatTime(stats.totalMinutesSpent || 0)}
                                 label="Hours Spent"
                                 iconBgColor="bg-purple-100 dark:bg-purple-900/30"
                                 iconColor="text-purple-600"
                             />
                             <StatsCard
                                 icon={<Flame className="w-5 h-5" />}
-                                value={12}
+                                value={stats.currentStreak || 0}
                                 label="Current Streak"
                                 iconBgColor="bg-orange-100 dark:bg-orange-900/30"
                                 iconColor="text-orange-600"
-                            />
-                            <StatsCard
-                                icon={<TrendingUp className="w-5 h-5" />}
-                                value="Top 5%"
-                                label="Class Rank"
-                                iconBgColor="bg-blue-100 dark:bg-blue-900/30"
-                                iconColor="text-blue-600"
                             />
                         </div>
                     </motion.div>
                 </div>
 
                 <motion.div variants={itemVariants} className="xl:col-span-4">
-                    <RecentActivity sessions={RECENT_SESSIONS} className="h-full" />
+                    <RecentActivity sessions={recentActivity} className="h-full" />
                 </motion.div>
             </motion.div>
+
+            {/* Goal Prompt Modal (Inline for simplicity) */}
+            {showGoalPrompt && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl">
+                        <h3 className="text-xl font-bold mb-4">Set Weekly Goal</h3>
+                        <p className="text-sm text-gray-500 mb-4">How many hours do you want to learn per week?</p>
+                        <Input
+                            type="number"
+                            placeholder="e.g. 5"
+                            value={goalInput}
+                            onChange={(e) => setGoalInput(e.target.value)}
+                            className="mb-4"
+                        />
+                        <Button onClick={handleGoalSubmit} className="w-full">Save Goal</Button>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

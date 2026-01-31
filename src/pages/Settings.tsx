@@ -1,26 +1,67 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { User, Bell, Palette, Shield, HelpCircle, LogOut } from 'lucide-react';
+import { User, Palette, HelpCircle, LogOut, Upload } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Avatar } from '@/components/ui/Avatar';
 import { useTheme } from '@/hooks/useTheme';
-import { MOCK_USER } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { auth } from '@/lib/api';
+import { removeToken } from '@/lib/auth';
+import { useUser } from '@/contexts/UserContext';
 
 const MENU_ITEMS = [
     { id: 'profile', label: 'Profile', icon: User },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'appearance', label: 'Appearance', icon: Palette },
-    { id: 'privacy', label: 'Privacy & Security', icon: Shield },
     { id: 'help', label: 'Help & Support', icon: HelpCircle },
 ];
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState('profile');
     const { theme, setTheme } = useTheme();
+    const { user, refreshUser } = useUser(); // Use context instead of API call
+    const [loading, setLoading] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleLogout = () => {
+        removeToken();
+        window.location.assign('/login');
+    };
+
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                alert("File too large. Max 2MB.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSelectedImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSaveChanges = async () => {
+        if (!selectedImage) return;
+        setLoading(true);
+        try {
+            await auth.updateProfile({ profilePicture: selectedImage });
+            // Refresh user context
+            await refreshUser();
+            setSelectedImage(null);
+            alert("Profile updated successfully!");
+        } catch (e) {
+            console.error("Update failed", e);
+            alert("Failed to update profile.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <AppLayout>
@@ -57,7 +98,10 @@ export default function Settings() {
                                     </button>
                                 ))}
                                 <hr className="my-2 border-gray-200 dark:border-gray-700" />
-                                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                >
                                     <LogOut className="w-5 h-5" />
                                     Log Out
                                 </button>
@@ -74,20 +118,44 @@ export default function Settings() {
                             <Card className="p-6">
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Profile Settings</h2>
                                 <div className="flex items-center gap-6 mb-8">
-                                    <Avatar src={MOCK_USER.avatar} alt={MOCK_USER.name} size="lg" ring />
+                                    <Avatar
+                                        src={selectedImage || user?.profilePicture}
+                                        alt={user?.fullName || 'User'}
+                                        size="lg"
+                                        ring
+                                    />
                                     <div>
-                                        <Button variant="secondary" size="sm">Change Photo</Button>
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            className="hidden"
+                                            accept="image/png, image/jpeg, image/gif"
+                                            onChange={handleImageSelect}
+                                        />
+                                        <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
+                                            <Upload className="w-4 h-4 mr-2" /> Change Photo
+                                        </Button>
                                         <p className="text-xs text-gray-500 mt-2">JPG, PNG or GIF. Max 2MB.</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Input label="Full Name" defaultValue={MOCK_USER.name} />
-                                    <Input label="Email" type="email" defaultValue={MOCK_USER.email} />
-                                    <Input label="Username" defaultValue="alex_learner" />
-                                    <Input label="Phone" placeholder="+1 (555) 000-0000" />
+                                    <Input
+                                        label="Full Name"
+                                        value={user?.fullName || ''}
+                                        disabled
+                                        className="bg-gray-100 dark:bg-gray-800 opacity-70 cursor-not-allowed"
+                                    />
+                                    <Input
+                                        label="Email"
+                                        value={user?.email || ''}
+                                        disabled
+                                        className="bg-gray-100 dark:bg-gray-800 opacity-70 cursor-not-allowed"
+                                    />
                                 </div>
                                 <div className="mt-6 flex justify-end">
-                                    <Button>Save Changes</Button>
+                                    <Button onClick={handleSaveChanges} loading={loading} disabled={!selectedImage}>
+                                        Save Changes
+                                    </Button>
                                 </div>
                             </Card>
                         )}
@@ -124,30 +192,28 @@ export default function Settings() {
                             </Card>
                         )}
 
-                        {activeTab === 'notifications' && (
-                            <Card className="p-6">
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Notification Preferences</h2>
-                                <div className="space-y-4">
-                                    {['Email notifications', 'Push notifications', 'Weekly summary', 'Quiz reminders'].map((item) => (
-                                        <div key={item} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                                            <span className="text-gray-900 dark:text-white font-medium">{item}</span>
-                                            <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-primary focus:ring-primary" />
-                                        </div>
-                                    ))}
-                                </div>
-                            </Card>
-                        )}
-
-                        {(activeTab === 'privacy' || activeTab === 'help') && (
+                        {activeTab === 'help' && (
                             <Card className="p-6">
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                                    {activeTab === 'privacy' ? 'Privacy & Security' : 'Help & Support'}
+                                    Help & Support
                                 </h2>
-                                <p className="text-gray-500 dark:text-gray-400">
-                                    {activeTab === 'privacy'
-                                        ? 'Manage your privacy settings and security preferences.'
-                                        : 'Get help with using Cognito or contact our support team.'}
-                                </p>
+                                <div className="space-y-6">
+                                    <div>
+                                        <h3 className="font-semibold text-lg mb-2">How do I use the app?</h3>
+                                        <p className="text-gray-600 dark:text-gray-400">
+                                            Start by navigating to the Dashboard. You can choose from various tutors like YouTube or PDF.
+                                            Track your progress and keep your streak alive!
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-lg mb-2">Useful Tips</h3>
+                                        <ul className="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-1">
+                                            <li>Set a realistic weekly goal to stay motivated.</li>
+                                            <li>Use the "Teach Me" mode for difficult concepts.</li>
+                                            <li>Upload your course materials to the PDF Tutor for quick summaries.</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </Card>
                         )}
                     </motion.div>
