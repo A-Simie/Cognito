@@ -138,19 +138,13 @@ export default function YouTubeTutor() {
                 </main>
 
                 {!isMobile && (
-                    <AjibadePanel
-                        className="w-[400px] shrink-0 hidden lg:flex"
-                        suggestions={['Explain this formula', 'Quiz me on this', 'Give me an example']}
-                    />
+                    <AjibadePanel className="w-[400px] shrink-0 hidden lg:flex" />
                 )}
             </div>
 
             {isMobile && (
                 <BottomSheet isOpen={isAjibadeOpen} onClose={() => setIsAjibadeOpen(false)}>
-                    <AjibadePanel
-                        className="h-[70vh] border-0"
-                        suggestions={['Explain this formula', 'Quiz me on this']}
-                    />
+                    <AjibadePanel className="h-[70vh] border-0" />
                 </BottomSheet>
             )}
         </div>

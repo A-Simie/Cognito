@@ -110,12 +110,6 @@
 /* Ajibade Panel - 30% */
 .ajibade-panel {
     flex: 0 0 30%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
     overflow-y: auto;
 }
 

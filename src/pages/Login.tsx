@@ -1,34 +1,48 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { GraduationCap, Mail, Lock } from 'lucide-react';
+import { GraduationCap, Mail, Lock, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { USE_MOCK_BACKEND } from '@/lib/apiConfig';
 import { MockAuthService } from '@/services/mockAuth';
-import axios from 'axios';
 
 export default function Login() {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [isLoading, setIsLoading] = useState(false);
+    const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
     const navigate = useNavigate();
+
+    const validate = () => {
+        const nextErrors: { email?: string; password?: string } = {};
+        const email = formData.email.trim();
+        const password = formData.password.trim();
+
+        if (!email) {
+            nextErrors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            nextErrors.email = 'Enter a valid email address';
+        }
+
+        if (!password) {
+            nextErrors.password = 'Password is required';
+        } else if (password.length < 6) {
+            nextErrors.password = 'Password must be at least 6 characters';
+        }
+
+        setErrors(nextErrors);
+        return Object.keys(nextErrors).length === 0;
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!validate()) return;
         setIsLoading(true);
         try {
-            if (USE_MOCK_BACKEND) {
-                // Mock mode - offline testing
-                const result = await MockAuthService.login(formData);
-                if (result.success) {
-                    navigate(`/verify-otp?email=${formData.email}&mode=login`);
-                } else {
-                    alert(result.message);
-                }
-            } else {
-                // Real API mode
-                await axios.post('/cognito/api/v1/login', formData);
+            const result = await MockAuthService.login(formData);
+            if (result.success) {
                 navigate(`/verify-otp?email=${formData.email}&mode=login`);
+            } else {
+                alert(result.message);
             }
         } catch (error) {
             console.error(error);
@@ -39,15 +53,31 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-blue-600 flex items-center justify-center p-4 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md relative z-10"
-            >
-                <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 backdrop-blur-sm">
+        <div className="min-h-screen bg-background-light dark:bg-background-dark text-gray-900 dark:text-white">
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                <div className="flex items-center justify-between mb-8">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/', { replace: true })}
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-primary transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4" /> Back to Home
+                    </button>
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                            <GraduationCap className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-black uppercase tracking-tight">Cognito</span>
+                    </div>
+                </div>
+
+                <div className="flex justify-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="w-full max-w-md"
+                    >
+                        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 backdrop-blur-sm">
                     <div className="flex flex-col items-center mb-8">
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shadow-lg mb-4">
                             <GraduationCap className="w-8 h-8 text-white" />
@@ -60,15 +90,25 @@ export default function Login() {
                             label="Email"
                             type="email"
                             value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            onChange={(e) => {
+                                setFormData({ ...formData, email: e.target.value });
+                                if (errors.email) setErrors({ ...errors, email: undefined });
+                            }}
                             icon={<Mail className="w-5 h-5" />}
+                            error={errors.email}
+                            required
                         />
                         <Input
                             label="Password"
                             type="password"
                             value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            onChange={(e) => {
+                                setFormData({ ...formData, password: e.target.value });
+                                if (errors.password) setErrors({ ...errors, password: undefined });
+                            }}
                             icon={<Lock className="w-5 h-5" />}
+                            error={errors.password}
+                            required
                         />
                         <div className="flex justify-end">
                             <Link to="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
@@ -81,7 +121,9 @@ export default function Login() {
                         Don't have an account? <Link to="/signup" className="text-primary font-bold">Sign Up</Link>
                     </p>
                 </div>
-            </motion.div>
+                    </motion.div>
+                </div>
+            </div>
         </div>
     );
 }

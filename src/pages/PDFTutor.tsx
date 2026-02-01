@@ -107,10 +107,7 @@ export default function PDFTutor() {
                 </section>
 
                 {!isMobile && (
-                    <AjibadePanel
-                        className="w-[450px] shrink-0 hidden lg:flex"
-                        suggestions={['Summarize page', 'Create quiz', 'Explain simple terms']}
-                    />
+                    <AjibadePanel className="w-[450px] shrink-0 hidden lg:flex" />
                 )}
             </main>
 
@@ -123,10 +120,7 @@ export default function PDFTutor() {
                         <MessageCircle className="w-6 h-6" />
                     </button>
                     <BottomSheet isOpen={isAjibadeOpen} onClose={() => setIsAjibadeOpen(false)}>
-                        <AjibadePanel
-                            className="h-[70vh] border-0"
-                            suggestions={['Summarize page', 'Create quiz']}
-                        />
+                        <AjibadePanel className="h-[70vh] border-0" />
                     </BottomSheet>
                 </>
             )}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, Play, FileText, Sparkles, ChevronRight, Menu, X, Activity, BookOpen, Brain, Terminal, Search, Clock, Zap } from 'lucide-react';
+import { GraduationCap, Play, FileText, ChevronRight, Menu, X, Activity, BookOpen, Brain, Terminal, Search, Clock, Zap, Target } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { cn } from '@/lib/utils';
@@ -22,7 +22,7 @@ const FEATURES = [
         className: '',
     },
     {
-        icon: Sparkles,
+        icon: Target,
         title: 'Adaptive Learning',
         description: 'Master any subject. Cognito architects a progressive learning path tailored to your current knowledge for maximum efficiency.',
         gradient: 'from-blue-600 to-blue-700',
@@ -264,7 +264,7 @@ export default function Landing() {
                                                 </div>
                                                 <div className="flex flex-col gap-3">
                                                     <div className="flex-1 rounded-2xl bg-blue-600/5 border border-blue-500/10 p-4">
-                                                        <Sparkles className="w-4 h-4 text-blue-600 mb-2" />
+                                                        <Brain className="w-4 h-4 text-blue-600 mb-2" />
                                                         <div className="space-y-1">
                                                             <div className="w-full h-1.5 bg-blue-600/20 rounded-full" />
                                                             <div className="w-5/6 h-1.5 bg-blue-600/20 rounded-full" />

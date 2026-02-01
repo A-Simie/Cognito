@@ -41,6 +41,18 @@ export interface Quiz {
     questions: QuizQuestion[];
 }
 
+export interface SessionStep {
+    id: number;
+    stepIndex: number;
+    stepType: string;
+    stepStatus: string;
+    stepPayload: {
+        textToSpeak?: string;
+        canvasHtmlContent?: string;
+        conversationQuestion?: string;
+    };
+}
+
 // Mock quiz database
 const mockQuizzes: Quiz[] = [
     {
@@ -100,6 +112,9 @@ let activeUnits: LessonUnit[] = [];
 let allClasses: ClassData[] = [];
 let currentClassId: number = 0;
 
+const classStore = new Map<number, { plan: AgentPlan; units: LessonUnit[] }>();
+const sessionStore = new Map<string, { sessionId: string; classId: number; unitId: string; steps: SessionStep[] }>();
+
 export const MockBackend = {
     // 1. Generate Plan (Simulates backend delay)
     generatePlan: async (topic: string): Promise<ClassData> => {
@@ -117,6 +132,9 @@ export const MockBackend = {
 
                 // Add to classes list
                 allClasses.push(newClass);
+
+                // Set active class
+                currentClassId = newClass.id;
 
                 // Generate corresponding plan and units
                 activePlan = {
@@ -137,6 +155,11 @@ export const MockBackend = {
                     duration: `${15 + i * 5} min`
                 }));
 
+                classStore.set(newClass.id, {
+                    plan: activePlan,
+                    units: [...activeUnits]
+                });
+
                 resolve(newClass);
             }, 1000); // 1s delay (faster for testing)
         });
@@ -151,42 +174,158 @@ export const MockBackend = {
         });
     },
 
+    // 2b. Get Recent Activity
+    getRecentActivity: async (): Promise<any[]> => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve([]);
+            }, 200);
+        });
+    },
+
     // 3. Get Current Class
     getMyClass: async (): Promise<{ plan: AgentPlan, units: LessonUnit[] }> => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                if (!activePlan) reject(new Error("No class found"));
-                else resolve({ plan: activePlan, units: activeUnits });
+                if (!activePlan || currentClassId === 0) {
+                    reject(new Error("No class found"));
+                    return;
+                }
+
+                const record = classStore.get(currentClassId);
+                if (!record) {
+                    reject(new Error("No class found"));
+                    return;
+                }
+
+                resolve({ plan: record.plan, units: record.units });
             }, 300);
         });
     },
 
     // 4. Complete Unit (Unlock next)
-    completeUnit: async (unitId: string): Promise<LessonUnit[]> => {
+    completeUnit: async (unitId: string, classId?: number): Promise<LessonUnit[]> => {
         return new Promise((resolve) => {
-            const idx = activeUnits.findIndex(u => u.id === unitId);
-            const unit = activeUnits[idx];
+            const targetClassId = classId ?? currentClassId;
+            const record = classStore.get(targetClassId);
+
+            if (!record) {
+                resolve([]);
+                return;
+            }
+
+            const units = record.units;
+            const idx = units.findIndex(u => u.id === unitId);
+            const unit = units[idx];
+
             if (unit) {
                 unit.unitStatus = 'COMPLETED';
 
-                const nextUnit = activeUnits[idx + 1];
-                if (nextUnit) {
+                const nextUnit = units[idx + 1];
+                if (nextUnit && nextUnit.unitStatus === 'LOCKED') {
                     nextUnit.unitStatus = 'IN_PROGRESS';
-    }
+                }
 
                 // Update class completion percentage
-                const completedCount = activeUnits.filter(u => u.unitStatus === 'COMPLETED').length;
-                const progress = Math.round((completedCount / activeUnits.length) * 100);
+                const completedCount = units.filter(u => u.unitStatus === 'COMPLETED').length;
+                const progress = Math.round((completedCount / units.length) * 100);
 
-                if (currentClassId > 0) {
-                    const currentClass = allClasses.find(c => c.id === currentClassId);
-                    if (currentClass) {
-                        currentClass.classCompletionPercentage = progress;
-                    }
+                const currentClass = allClasses.find(c => c.id === targetClassId);
+                if (currentClass) {
+                    currentClass.classCompletionPercentage = progress;
                 }
             }
-            resolve([...activeUnits]);
+
+            record.units = [...units];
+            resolve([...record.units]);
         });
+    },
+
+    // 4b. Get Lesson Units for a Class
+    getLessonUnits: async (classId: number): Promise<LessonUnit[]> => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const record = classStore.get(classId);
+                if (!record) {
+                    reject(new Error('Class not found'));
+                    return;
+                }
+                resolve([...record.units]);
+            }, 300);
+        });
+    },
+
+    // 4c. Start Lesson Session
+    startLesson: async (classId: number, unitId: string): Promise<{ sessionId: string }> => {
+        return new Promise((resolve, reject) => {
+            setTimeout(async () => {
+                const record = classStore.get(classId);
+                if (!record) {
+                    reject(new Error('Class not found'));
+                    return;
+                }
+
+                const html = await MockBackend.getLessonContent(unitId);
+                const sessionId = `session_${classId}_${unitId}_${Date.now()}`;
+
+                const steps: SessionStep[] = [
+                    {
+                        id: 1,
+                        stepIndex: 0,
+                        stepType: 'CONTENT',
+                        stepStatus: 'READY',
+                        stepPayload: {
+                            textToSpeak: 'Let’s explore this concept step by step.',
+                            canvasHtmlContent: html
+                        }
+                    },
+                    {
+                        id: 2,
+                        stepIndex: 1,
+                        stepType: 'CONTENT',
+                        stepStatus: 'READY',
+                        stepPayload: {
+                            textToSpeak: 'Here is a deeper example to visualize the idea.',
+                            canvasHtmlContent: html
+                        }
+                    },
+                    {
+                        id: 3,
+                        stepIndex: 2,
+                        stepType: 'SUMMARY',
+                        stepStatus: 'READY',
+                        stepPayload: {
+                            textToSpeak: 'Quick recap before you continue.',
+                            canvasHtmlContent: html
+                        }
+                    }
+                ];
+
+                sessionStore.set(sessionId, { sessionId, classId, unitId, steps });
+                resolve({ sessionId });
+            }, 300);
+        });
+    },
+
+    // 4d. Get Session Steps
+    getSessionSteps: async (sessionId: string): Promise<SessionStep[]> => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const session = sessionStore.get(sessionId);
+                if (!session) {
+                    reject(new Error('Session not found'));
+                    return;
+                }
+                resolve([...session.steps]);
+            }, 200);
+        });
+    },
+
+    // 4e. Complete Session (mark unit completed)
+    completeSession: async (sessionId: string): Promise<void> => {
+        const session = sessionStore.get(sessionId);
+        if (!session) return;
+        await MockBackend.completeUnit(session.unitId, session.classId);
     },
 
     // 5. Get Quiz for Lesson

@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '@/lib/api';
+import { MockBackend } from '@/services/mockBackend';
 import { Lock, PlayCircle, CheckCircle, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LessonUnit {
-    id: number;
+    id: string;
     title: string;
-    description: string;
-    duration: number;              // Matches backend field name
-    unitOrder: number;             // Added - backend uses this
-    unitType: string;              // Added - backend uses this
-    unitStatus: 'LOCKED' | 'IN_PROGRESS' | 'AVAILABLE' | 'COMPLETED';  // Added IN_PROGRESS
+    duration?: string;
+    unitOrder: number;
+    unitType: string;
+    unitStatus: 'LOCKED' | 'IN_PROGRESS' | 'COMPLETED';
 }
 
 
@@ -19,7 +18,6 @@ export function LessonUnitsList() {
     const navigate = useNavigate();
     const [units, setUnits] = useState<LessonUnit[]>([]);
     const [loading, setLoading] = useState(true);
-    const [classId, setClassId] = useState<number | null>(null);
 
     useEffect(() => {
         // Get classId from localStorage or navigation state
@@ -30,44 +28,32 @@ export function LessonUnitsList() {
         }
 
         const id = parseInt(storedClassId);
-        setClassId(id);
 
-        // Fetch units from real backend - with polling if needed
-        const checkUnits = async (attempts = 0): Promise<void> => {
-            const maxAttempts = 25; // 50 seconds max (2s interval)
-
-            try {
-                const response = await api.get(`/${id}/lesson-units`);
-
-                if (response.data && response.data.length > 0) {
-                    // Units ready!
-                    setUnits(response.data);
-                    setLoading(false);
-                } else if (attempts < maxAttempts) {
-                    // Units not ready yet, poll again in 2s
-                    console.log(`Units not ready yet, retrying... (${attempts + 1}/${maxAttempts})`);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    return checkUnits(attempts + 1);
-                } else {
-                    // Timeout
-                    console.error('Timeout waiting for units');
-                    setLoading(false);
-                    navigate('/classes');
-                }
-            } catch (error) {
+        // Fetch units from mock backend
+        MockBackend.getLessonUnits(id)
+            .then((data) => {
+                setUnits(data);
+                setLoading(false);
+            })
+            .catch((error) => {
                 console.error('Failed to load units:', error);
                 setLoading(false);
                 navigate('/classes');
-            }
-        };
-
-        checkUnits();
+            });
     }, []); // Empty deps - run ONLY on mount!
 
     const handleUnitClick = (unit: LessonUnit) => {
         if (unit.unitStatus === 'LOCKED') return;
-        navigate('/teach-me/session/setup', { state: { unit } });
+        navigate('/teach-me/session/setup', { state: { unit }, replace: true });
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#1a1b26] text-white">
+                Loading units...
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex flex-col bg-[#1a1b26]">

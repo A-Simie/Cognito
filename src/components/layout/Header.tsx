@@ -34,14 +34,14 @@ export function Header() {
                             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
 
-                        <Link to="/" className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                             <div className="w-8 h-8 text-primary bg-primary/10 rounded-lg flex items-center justify-center">
                                 <GraduationCap className="w-5 h-5" />
                             </div>
                             <h2 className="text-gray-900 dark:text-white text-xl font-bold tracking-tight">
                                 Cognito
                             </h2>
-                        </Link>
+                        </div>
 
                         <nav className="hidden md:flex items-center gap-8">
                             {navLinks.map((link) => {
@@ -94,14 +94,14 @@ export function Header() {
             >
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-8">
-                        <Link to="/" onClick={closeMobileMenu} className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                             <div className="w-8 h-8 text-primary bg-primary/10 rounded-lg flex items-center justify-center">
                                 <GraduationCap className="w-5 h-5" />
                             </div>
                             <h2 className="text-gray-900 dark:text-white text-xl font-bold tracking-tight">
                                 Cognito
                             </h2>
-                        </Link>
+                        </div>
                         <button
                             onClick={closeMobileMenu}
                             className="p-2 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"

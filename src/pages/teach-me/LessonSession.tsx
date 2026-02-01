@@ -2,10 +2,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { useLessonWebSocket } from '@/hooks/useLessonWebSocket';
-import { AjibadeAvatar } from '@/components/lesson/AjibadeAvatar';
-import { AudioWaveform } from '@/components/lesson/AudioWaveform';
-import { StepProgress } from '@/components/lesson/StepProgress';
-import { LessonControls } from '@/components/lesson/LessonControls';
+import { AjibadePanel } from '@/components/features/ajibade';
+import { ConfirmDialog } from '@/components/dialog/ConfirmDialog';
+import { MockBackend } from '@/services/mockBackend';
 import './LessonSession.css';
 
 export function LessonSession() {
@@ -13,6 +12,7 @@ export function LessonSession() {
     const navigate = useNavigate();
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [showExitDialog, setShowExitDialog] = useState(false);
 
     // WebSocket connection with audio callbacks
     const {
@@ -21,11 +21,9 @@ export function LessonSession() {
         sendStepCompleted,
         currentAudioStep,
         completedAudioSteps,
-        replayAudio
     } = useLessonWebSocket(sessionId || null);
 
     const currentStep = steps[currentStepIndex];
-    const isAudioPlaying = currentAudioStep === currentStep?.id;
     const audioFinished = currentStep ? completedAudioSteps.has(currentStep.id) : false;
 
     // Update iframe when step changes
@@ -41,31 +39,20 @@ export function LessonSession() {
         }
     }, [currentStep]);
 
-    const handleNext = () => {
-        if (!audioFinished) return;
-
-        if (currentStep) {
-            // Send completion to backend
-            sendStepCompleted(currentStep.id);
+    // Auto-advance when audio finishes
+    useEffect(() => {
+        if (audioFinished && currentStepIndex < steps.length - 1) {
+            // Optional: auto-advance or wait for user
         }
+    }, [audioFinished, currentStepIndex, steps.length]);
 
-        //  Move to next step
-        if (currentStepIndex < steps.length - 1) {
-            setCurrentStepIndex(prev => prev + 1);
-        } else {
-            // Lesson complete
-            navigate('/teach-me/class/units');
-        }
+    const handleBackClick = () => {
+        setShowExitDialog(true);
     };
 
-    const handleComeAgain = () => {
-        if (currentStep) {
-            replayAudio(currentStep.id);
-        }
-    };
-
-    const handleBack = () => {
-        navigate('/teach-me/class/units');
+    const handleConfirmExit = () => {
+        setShowExitDialog(false);
+        navigate('/teach-me/class/units', { replace: true });
     };
 
     if (!sessionId) {
@@ -74,9 +61,20 @@ export function LessonSession() {
 
     return (
         <div className="lesson-session-container">
+            {/* Exit Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={showExitDialog}
+                title="End Session?"
+                message="Are you sure you want to leave? Your current session will end and you'll need to restart this lesson from the beginning."
+                confirmText="End Session"
+                cancelText="Continue Learning"
+                onConfirm={handleConfirmExit}
+                onCancel={() => setShowExitDialog(false)}
+            />
+
             {/* Header */}
             <div className="lesson-header">
-                <button onClick={handleBack} className="back-button">
+                <button onClick={handleBackClick} className="back-button">
                     <ChevronLeft className="w-5 h-5" />
                     Back to Curriculum
                 </button>
@@ -109,24 +107,7 @@ export function LessonSession() {
                 </div>
 
                 {/* Ajibade Panel - 30% */}
-                <div className="ajibade-panel">
-                    <AjibadeAvatar isSpeaking={isAudioPlaying} />
-
-                    <AudioWaveform isActive={isAudioPlaying} />
-
-                    {steps.length > 0 && (
-                        <StepProgress
-                            current={currentStepIndex}
-                            total={steps.length}
-                        />
-                    )}
-
-                    <LessonControls
-                        onNext={handleNext}
-                        onComeAgain={handleComeAgain}
-                        canProceed={audioFinished}
-                    />
-                </div>
+                <AjibadePanel className="ajibade-panel" />
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import api from '@/lib/api';
+import { MockBackend } from '@/services/mockBackend';
 import { Loader2 } from 'lucide-react';
 
 export function LessonGeneration() {
@@ -22,42 +22,23 @@ export function LessonGeneration() {
             return;
         }
 
-        // Create class using real backend
+        // Create class using mock backend
         const createClass = async () => {
             try {
                 // Progress starts at 5%
                 setProgress(5);
                 setStatus(`Analyzing "${state.topic}"...`);
 
-                // Step 1: Create class via real API
-                const response = await api.post('/topic_class_creation', {
-                    topicText: state.topic
-                });
-                const classId = response.data.id;
+                // Step 1: Create class via mock backend
+                const newClass = await MockBackend.generatePlan(state.topic);
+                const classId = newClass.id;
 
-                // Step 2: Poll for units (syllabus generation)
+                // Step 2: Fetch units
                 setStatus('Structuring core concepts...');
-                let attempts = 0;
-                const maxAttempts = 25; // 50 seconds max (2s interval)
-
-                const pollUnits = async (): Promise<boolean> => {
-                    if (attempts++ >= maxAttempts) {
-                        throw new Error('Syllabus generation timeout');
-                    }
-
-                    const unitsResponse = await api.get(`/${classId}/lesson-units`);
-
-                    if (unitsResponse.data && unitsResponse.data.length > 0) {
-                        return true; // Success!
-                    }
-
-                    // Wait 2 seconds before next poll
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    return pollUnits();
-                };
+                await MockBackend.getLessonUnits(classId);
 
                 setStatus('Generating lesson modules...');
-                await pollUnits();
+                await new Promise(resolve => setTimeout(resolve, 600));
 
                 setStatus('Finalizing curriculum...');
                 await new Promise(resolve => setTimeout(resolve, 1000));

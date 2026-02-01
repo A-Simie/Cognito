@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { TeachMeEntry } from '@/pages/teach-me/TeachMeEntry';
 import { TopicSelection } from '@/pages/teach-me/TopicSelection';
 import { LessonGeneration } from '@/pages/teach-me/LessonGeneration';
 import { LessonUnitsList } from '@/pages/teach-me/LessonUnitsList';

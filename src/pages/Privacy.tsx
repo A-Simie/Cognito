@@ -1,9 +1,20 @@
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 
 export default function Privacy() {
+    const navigate = useNavigate();
+
     return (
         <AppLayout>
             <div className="max-w-4xl mx-auto p-6 lg:p-10">
+                <button
+                    type="button"
+                    onClick={() => navigate('/signup', { replace: true })}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-primary transition-colors mb-6"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Back to Sign Up
+                </button>
                 <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
                 <div className="prose dark:prose-invert">
                     <p>Last updated: January 2026</p>

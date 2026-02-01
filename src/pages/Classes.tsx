@@ -101,31 +101,12 @@ export default function Classes() {
                                     >
                                         <Card
                                             variant="interactive"
-                                            className="overflow-hidden h-full flex flex-col hover:shadow-xl transition-shadow"
+                                            className="p-5 bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800 shadow-soft hover:shadow-lg transition-shadow"
                                         >
-                                            {/* Clean solid header - Udemy/Coursera style */}
-                                            <div className="relative h-32 bg-gray-800 dark:bg-gray-900">
-                                                {/* New badge */}
-                                                {isNew && (
-                                                    <div className="absolute top-3 right-3 px-2 py-1 bg-green-500 rounded text-xs font-semibold text-white">
-                                                        NEW
-                                                    </div>
-                                                )}
-                                                {/* Class icon */}
-                                                <div className="absolute bottom-4 left-4">
-                                                    <div className="w-14 h-14 rounded bg-primary/10 flex items-center justify-center">
-                                                        <BookOpen className="w-7 h-7 text-primary" />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Content */}
-                                            <div className="p-5 flex-1 flex flex-col">
-                                                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                                                    {/* Parse title - handle both string and JSON format */}
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h3 className="font-bold text-lg text-gray-900 dark:text-white line-clamp-1">
                                                     {(() => {
                                                         try {
-                                                            // If title is JSON string like {"topicText":"Python"}, parse it
                                                             if (typeof cls.title === 'string' && cls.title.startsWith('{')) {
                                                                 const parsed = JSON.parse(cls.title);
                                                                 return parsed.topicText || cls.title;
@@ -136,61 +117,55 @@ export default function Classes() {
                                                         }
                                                     })()}
                                                 </h3>
-
-                                                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
-                                                    <span className="flex items-center gap-1.5">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                                        {cls.classStatus || 'ACTIVE'}
+                                                {isNew && (
+                                                    <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
+                                                        NEW
                                                     </span>
-                                                    <span>•</span>
-                                                    <span>{cls.lessons || 0} units</span>
-                                                </div>
+                                                )}
+                                            </div>
 
-                                                {/* Progress Bar */}
-                                                <div className="mb-4">
-                                                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                                        <span>Progress</span>
-                                                        <span className="font-bold">{Math.round(progress)}%</span>
-                                                    </div>
-                                                    <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
-                                                        <motion.div
-                                                            initial={{ width: 0 }}
-                                                            animate={{ width: `${progress}%` }}
-                                                            transition={{ duration: 1, delay: i * 0.1 + 0.3 }}
-                                                            className={cn(
-                                                                "h-full rounded-full transition-all",
-                                                                progress === 100
-                                                                    ? "bg-gradient-to-r from-green-500 to-emerald-500"
-                                                                    : "bg-gradient-to-r from-primary to-indigo-500"
-                                                            )}
-                                                        />
-                                                    </div>
-                                                </div>
+                                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                                <span className="flex items-center gap-1.5">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                                    {cls.classStatus || 'ACTIVE'}
+                                                </span>
+                                                <span>•</span>
+                                                <span>{cls.lessons || 0} units</span>
+                                            </div>
 
-                                                {/* Start/Resume Button */}
-                                                <div className="mt-auto">
-                                                    <Button
+                                            <div className="mb-4">
+                                                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                                    <span>Progress</span>
+                                                    <span className="font-bold">{Math.round(progress)}%</span>
+                                                </div>
+                                                <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+                                                    <div
                                                         className={cn(
-                                                            "w-full group-hover:shadow-lg group-hover:scale-[1.02] transition-all duration-200",
-                                                            progress === 100 && "bg-green-600 hover:bg-green-700"
+                                                            "h-full rounded-full",
+                                                            progress === 100
+                                                                ? "bg-gradient-to-r from-green-500 to-emerald-500"
+                                                                : "bg-gradient-to-r from-primary to-indigo-500"
                                                         )}
-                                                    >
-                                                        {progress === 100 ? (
-                                                            <>
-                                                                <Check className="w-4 h-4" /> Review
-                                                            </>
-                                                        ) : hasProgress ? (
-                                                            <>
-                                                                <Play className="w-4 h-4 fill-current" /> Resume Learning
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Play className="w-4 h-4 fill-current" /> Start Learning
-                                                            </>
-                                                        )}
-                                                    </Button>
+                                                        style={{ width: `${progress}%` }}
+                                                    />
                                                 </div>
                                             </div>
+
+                                            <Button className="w-full">
+                                                {progress === 100 ? (
+                                                    <>
+                                                        <Check className="w-4 h-4" /> Review
+                                                    </>
+                                                ) : hasProgress ? (
+                                                    <>
+                                                        <Play className="w-4 h-4 fill-current" /> Resume Learning
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Play className="w-4 h-4 fill-current" /> Start Learning
+                                                    </>
+                                                )}
+                                            </Button>
                                         </Card>
                                     </Link>
                                 </motion.div>

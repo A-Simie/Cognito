@@ -8,6 +8,16 @@ export interface MockUser {
     fullName: string;
     email: string;
     password: string;
+    profilePicture?: string | null;
+    weeklyGoalHours?: number;
+    stats?: {
+        weeklyGoalHours?: number;
+        totalMinutesSpent?: number;
+        classesEnrolled?: number;
+        completionRate?: number;
+        currentStreak?: number;
+        lessonsCompleted?: number;
+    };
 }
 
 // Mock user database (in-memory)
@@ -16,7 +26,17 @@ const mockUsers: MockUser[] = [
         id: 1,
         fullName: 'Test User',
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
+        profilePicture: null,
+        weeklyGoalHours: 10,
+        stats: {
+            weeklyGoalHours: 10,
+            totalMinutesSpent: 0,
+            classesEnrolled: 0,
+            completionRate: 0,
+            currentStreak: 0,
+            lessonsCompleted: 0
+        }
     }
 ];
 
@@ -24,6 +44,22 @@ const mockUsers: MockUser[] = [
 const MOCK_OTP = '123456';
 
 let nextUserId = 2;
+
+const buildUserProfile = (user: MockUser) => ({
+    id: user.id,
+    fullName: user.fullName,
+    email: user.email,
+    profilePicture: user.profilePicture ?? null,
+    weeklyGoalHours: user.weeklyGoalHours,
+    stats: {
+        weeklyGoalHours: user.stats?.weeklyGoalHours ?? user.weeklyGoalHours,
+        totalMinutesSpent: user.stats?.totalMinutesSpent ?? 0,
+        classesEnrolled: user.stats?.classesEnrolled ?? 0,
+        completionRate: user.stats?.completionRate ?? 0,
+        currentStreak: user.stats?.currentStreak ?? 0,
+        lessonsCompleted: user.stats?.lessonsCompleted ?? 0
+    }
+});
 
 export const MockAuthService = {
     /**
@@ -44,7 +80,17 @@ export const MockAuthService = {
                     id: nextUserId++,
                     fullName: data.fullName,
                     email: data.email,
-                    password: data.password
+                    password: data.password,
+                    profilePicture: null,
+                    weeklyGoalHours: undefined,
+                    stats: {
+                        weeklyGoalHours: undefined,
+                        totalMinutesSpent: 0,
+                        classesEnrolled: 0,
+                        completionRate: 0,
+                        currentStreak: 0,
+                        lessonsCompleted: 0
+                    }
                 });
 
                 console.log('🎭 Mock Signup: User created', data.email);
@@ -102,19 +148,7 @@ export const MockAuthService = {
                 resolve({
                     success: true,
                     token: mockToken,
-                    user: {
-                        id: user.id,
-                        fullName: user.fullName,
-                        email: user.email,
-                        profilePicture: null,
-                        weeklyGoalHours: 10,
-                        stats: {
-                            weeklyGoalHours: 10,
-                            totalMinutesSpent: 0,
-                            classesEnrolled: 0,
-                            completionRate: 0
-                        }
-                    },
+                    user: buildUserProfile(user),
                     message: 'Login successful'
                 });
             }, 500);
@@ -140,23 +174,90 @@ export const MockAuthService = {
                 const user = mockUsers.find(u => u.id === userId);
 
                 if (user) {
-                    resolve({
-                        id: user.id,
-                        fullName: user.fullName,
-                        email: user.email,
-                        profilePicture: null,
-                        weeklyGoalHours: 10,
-                        stats: {
-                            weeklyGoalHours: 10,
-                            totalMinutesSpent: 0,
-                            classesEnrolled: 0,
-                            completionRate: 0
-                        }
-                    });
+                    resolve(buildUserProfile(user));
                 } else {
                     resolve(null);
                 }
             }, 300);
+        });
+    },
+
+    /**
+     * Update profile (weekly goal / profile picture)
+     */
+    updateProfile: async (token: string, data: { profilePicture?: string; weeklyGoalHours?: number }): Promise<{ success: boolean; message: string; user?: any }> => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const match = token.match(/mock_token_(\d+)/);
+                const userIdStr = match?.[1];
+
+                if (!userIdStr) {
+                    resolve({ success: false, message: 'Invalid token' });
+                    return;
+                }
+
+                const userId = parseInt(userIdStr, 10);
+                const user = mockUsers.find(u => u.id === userId);
+
+                if (!user) {
+                    resolve({ success: false, message: 'User not found' });
+                    return;
+                }
+
+                if (data.profilePicture !== undefined) {
+                    user.profilePicture = data.profilePicture;
+                }
+
+                if (data.weeklyGoalHours !== undefined) {
+                    user.weeklyGoalHours = data.weeklyGoalHours;
+                    user.stats = {
+                        ...user.stats,
+                        weeklyGoalHours: data.weeklyGoalHours
+                    };
+                }
+
+                resolve({ success: true, message: 'Profile updated', user: buildUserProfile(user) });
+            }, 300);
+        });
+    },
+
+    /**
+     * Request password reset
+     */
+    requestPasswordReset: async (data: { email: string }): Promise<{ success: boolean; message: string }> => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const user = mockUsers.find(u => u.email === data.email);
+                if (!user) {
+                    resolve({ success: false, message: 'User not found' });
+                    return;
+                }
+                resolve({ success: true, message: 'OTP sent to email' });
+            }, 400);
+        });
+    },
+
+    /**
+     * Verify reset OTP and update password
+     */
+    verifyResetOTP: async (data: { email: string; otp: string; newPassword: string }): Promise<{ success: boolean; message: string }> => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const user = mockUsers.find(u => u.email === data.email);
+
+                if (!user) {
+                    resolve({ success: false, message: 'User not found' });
+                    return;
+                }
+
+                if (data.otp !== MOCK_OTP) {
+                    resolve({ success: false, message: 'Invalid OTP' });
+                    return;
+                }
+
+                user.password = data.newPassword;
+                resolve({ success: true, message: 'Password reset successfully' });
+            }, 400);
         });
     }
 };

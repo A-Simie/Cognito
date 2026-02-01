@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react';
-import { Send, Plus } from 'lucide-react';
+import { Send, Mic, MicOff, Plus } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
@@ -14,7 +14,6 @@ interface Message {
 
 interface AjibadePanelProps {
     className?: string;
-    suggestions?: string[];
 }
 
 const AJIBADE_AVATAR =
@@ -29,10 +28,11 @@ const INITIAL_MESSAGES: Message[] = [
     },
 ];
 
-export function AjibadePanel({ className, suggestions = [] }: AjibadePanelProps) {
+export function AjibadePanel({ className }: AjibadePanelProps) {
     const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
     const chatRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -68,21 +68,42 @@ export function AjibadePanel({ className, suggestions = [] }: AjibadePanelProps)
         }, 1500);
     };
 
+    const toggleRecording = () => {
+        setIsRecording(!isRecording);
+        // Audio recording logic would go here
+        if (!isRecording) {
+            // Start recording
+            setTimeout(() => {
+                setIsRecording(false);
+                setInput((prev) => prev + (prev ? ' ' : '') + 'Voice message transcribed...');
+            }, 2000);
+        }
+    };
+
     return (
-        <div className={cn('flex flex-col bg-white dark:bg-card-dark border-l border-gray-200 dark:border-gray-700 shadow-xl', className)}>
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
-                <Avatar src={AJIBADE_AVATAR} alt="Ajibade" size="lg" ring status="online" />
-                <div className="text-center">
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white">Ajibade AI Tutor</h3>
-                    <p className="text-xs text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full inline-block">
-                        Online • Ready to help
-                    </p>
+        <div className={cn('flex flex-col bg-gradient-to-b from-slate-900 to-slate-950 shadow-2xl', className)}>
+            {/* Header */}
+            <div className="p-6 border-b border-white/10 bg-slate-900/80 backdrop-blur-xl">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="relative">
+                        <div className="absolute -inset-2 bg-gradient-to-r from-primary/30 to-indigo-500/30 rounded-full blur-lg opacity-60" />
+                        <Avatar src={AJIBADE_AVATAR} alt="Ajibade" size="lg" ring className="relative" />
+                        <span className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-900 shadow-lg" />
+                    </div>
+                    <div className="text-center">
+                        <h3 className="font-bold text-xl text-white tracking-tight">Ajibade AI Tutor</h3>
+                        <div className="flex items-center justify-center gap-2 mt-1">
+                            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                            <span className="text-sm text-emerald-400 font-medium">Online • Ready to help</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-6 chat-scroll bg-gray-50 dark:bg-gray-900/50">
+            {/* Chat Area */}
+            <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-6 bg-slate-900/50">
                 <div className="flex justify-center">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest bg-slate-800/80 px-4 py-1.5 rounded-full border border-white/5">
                         Today
                     </span>
                 </div>
@@ -98,29 +119,18 @@ export function AjibadePanel({ className, suggestions = [] }: AjibadePanelProps)
                 {isTyping && <TypingIndicator />}
             </div>
 
-            <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                {suggestions.length > 0 && (
-                    <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide">
-                        {suggestions.map((suggestion, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setInput(suggestion)}
-                                className="whitespace-nowrap px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors border border-primary/20"
-                            >
-                                {suggestion}
-                            </button>
-                        ))}
-                    </div>
-                )}
+            {/* Input Area */}
+            <div className="p-4 bg-slate-900/90 backdrop-blur-xl border-t border-white/5">
                 <form onSubmit={handleSubmit}>
-                    <div className="relative flex items-end gap-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-xl focus-within:ring-2 focus-within:ring-primary/20 transition-all border border-transparent focus-within:border-primary/30">
+                    <div className="flex items-center gap-3 bg-slate-800/80 p-2 rounded-2xl border border-white/10 focus-within:border-primary/40 transition-all duration-300 focus-within:shadow-lg focus-within:shadow-primary/10">
                         <button
                             type="button"
-                            className="p-2 text-gray-400 hover:text-primary transition-colors rounded-full hover:bg-white/50 dark:hover:bg-white/10"
+                            className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 transition-all rounded-xl"
                         >
                             <Plus className="w-5 h-5" />
                         </button>
-                        <textarea
+                        
+                        <input
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => {
@@ -129,20 +139,35 @@ export function AjibadePanel({ className, suggestions = [] }: AjibadePanelProps)
                                     handleSubmit(e);
                                 }
                             }}
-                            className="w-full bg-transparent border-0 p-2 text-sm max-h-32 focus:ring-0 resize-none text-gray-900 dark:text-white placeholder-gray-400"
+                            className="flex-1 bg-transparent border-0 py-2.5 text-sm focus:ring-0 focus:outline-none text-white placeholder-slate-500"
                             placeholder="Ask a question..."
-                            rows={1}
                         />
+                        
+                        {/* Audio Record Button */}
+                        <button
+                            type="button"
+                            onClick={toggleRecording}
+                            className={cn(
+                                "p-2.5 rounded-xl transition-all duration-300",
+                                isRecording 
+                                    ? "bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30" 
+                                    : "text-slate-400 hover:text-white hover:bg-white/10"
+                            )}
+                        >
+                            {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                        </button>
+                        
+                        {/* Send Button */}
                         <button
                             type="submit"
                             disabled={!input.trim()}
-                            className="p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors shadow-sm mb-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2.5 bg-gradient-to-r from-primary to-indigo-500 text-white rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
                         >
                             <Send className="w-5 h-5" />
                         </button>
                     </div>
                 </form>
-                <p className="text-[10px] text-center text-gray-400 mt-2">
+                <p className="text-xs text-center text-slate-500 mt-3">
                     Ajibade can make mistakes. Consider checking important information.
                 </p>
             </div>

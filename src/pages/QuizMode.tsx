@@ -53,13 +53,13 @@ export default function QuizMode() {
                     />
                 </div>
                 <div className="px-6 py-4 max-w-7xl mx-auto flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-3">
+                    <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                             <GraduationCap className="w-5 h-5" />
                         </div>
                         <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Cognito</h1>
-                    </Link>
-                    <Link to="/">
+                    </div>
+                    <Link to="/dashboard">
                         <Button variant="ghost" size="sm">
                             Exit Quiz <LogOut className="w-4 h-4" />
                         </Button>

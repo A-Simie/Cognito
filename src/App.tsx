@@ -9,8 +9,6 @@ import VerifyOtp from '@/pages/VerifyOtp';
 import ForgotPassword from '@/pages/ForgotPassword';
 import Classes from '@/pages/Classes';
 import Settings from '@/pages/Settings';
-import YouTubeTutor from '@/pages/YouTubeTutor';
-import PDFTutor from '@/pages/PDFTutor';
 import QuizMode from '@/pages/QuizMode';
 import TeachMe from '@/pages/TeachMe';
 import Community from '@/pages/Community';
@@ -41,8 +39,6 @@ export default function App() {
                         <Route path="/classes" element={<PrivateRoute><Classes /></PrivateRoute>} />
                         <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
 
-                        <Route path="/youtube" element={<PrivateRoute><YouTubeTutor /></PrivateRoute>} />
-                        <Route path="/pdf" element={<PrivateRoute><PDFTutor /></PrivateRoute>} />
                         <Route path="/quiz" element={<PrivateRoute><QuizMode /></PrivateRoute>} />
                         <Route path="/teach-me/*" element={<PrivateRoute><TeachMe /></PrivateRoute>} />
                         <Route path="/community" element={<PrivateRoute><Community /></PrivateRoute>} />

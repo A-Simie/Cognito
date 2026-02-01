@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Play, Upload, MessageCircle, Check, Clock, Flame, ChevronRight } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { StatsCard, RecentActivity } from '@/components/shared';
+import { ConfirmDialog } from '@/components/dialog/ConfirmDialog';
 import { cn } from '@/lib/utils';
 import { auth, learning } from '@/lib/api'; // Added 'auth' import
 import { useUser } from '@/contexts/UserContext';
@@ -24,24 +25,26 @@ const LEARNING_MODES = [
         title: 'YouTube Tutor',
         description: 'Turn any video into an interactive lesson with real-time quizzes and notes.',
         icon: Play,
-        href: '/youtube',
-        buttonText: 'Start Watching',
+        href: null, // Coming soon
+        buttonText: 'Coming Soon',
         gradient: 'from-red-500/10 to-pink-500/10',
         hoverBorder: 'hover:border-red-200',
         iconBg: 'from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20',
         iconColor: 'text-red-500',
+        comingSoon: true,
     },
     {
         id: 'pdf',
         title: 'PDF Tutor',
         description: 'Upload readings and documents to get instant summaries and key takeaways.',
         icon: Upload,
-        href: '/pdf',
-        buttonText: 'Upload PDF',
+        href: null, // Coming soon
+        buttonText: 'Coming Soon',
         gradient: 'from-blue-500/10 to-indigo-500/10',
         hoverBorder: 'hover:border-blue-200',
         iconBg: 'from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20',
         iconColor: 'text-blue-600',
+        comingSoon: true,
     },
     {
         id: 'teach-me',
@@ -54,6 +57,7 @@ const LEARNING_MODES = [
         hoverBorder: 'hover:border-orange-200',
         iconBg: 'from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20',
         iconColor: 'text-orange-500',
+        comingSoon: false,
     },
 ];
 
@@ -72,10 +76,13 @@ const itemVariants = {
 
 export default function Dashboard() {
     const { user, refreshUser } = useUser(); // Use context
+    const navigate = useNavigate();
     const [recentActivity, setRecentActivity] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showGoalPrompt, setShowGoalPrompt] = useState(false);
     const [goalInput, setGoalInput] = useState('');
+    const [showComingSoon, setShowComingSoon] = useState(false);
+    const [comingSoonFeature, setComingSoonFeature] = useState('');
 
     useEffect(() => {
         loadData();
@@ -85,10 +92,6 @@ export default function Dashboard() {
         try {
             const activity = await learning.getRecentActivity().catch(() => []);
             setRecentActivity(activity);
-            // Check if stats.weeklyGoalHours is missing
-            if (user && !user.stats?.weeklyGoalHours) {
-                setShowGoalPrompt(true);
-            }
         } catch (e) {
             console.error("Failed to load data", e);
         } finally {
@@ -96,11 +99,21 @@ export default function Dashboard() {
         }
     };
 
+    useEffect(() => {
+        if (!user) return;
+        const hasGoal = (user.stats?.weeklyGoalHours ?? 0) > 0;
+        const prompted = localStorage.getItem('weeklyGoalPrompted') === 'true';
+        if (!hasGoal && !prompted) {
+            setShowGoalPrompt(true);
+        }
+    }, [user]);
+
     const handleGoalSubmit = async () => {
         if (!goalInput) return;
         try {
             await auth.updateProfile({ weeklyGoalHours: parseInt(goalInput) });
             setShowGoalPrompt(false);
+            localStorage.setItem('weeklyGoalPrompted', 'true');
             await refreshUser(); // Refresh user profile to update stats
             loadData(); // Refresh to update UI
         } catch (e) {
@@ -199,12 +212,21 @@ export default function Dashboard() {
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 leading-relaxed">
                                     {mode.description}
                                 </p>
-                                <Link to={mode.href}>
-                                    <Button className="w-full">
-                                        {mode.buttonText}
-                                        <ChevronRight className="w-4 h-4" />
-                                    </Button>
-                                </Link>
+                                <Button 
+                                    className="w-full"
+                                    onClick={() => {
+                                        if (mode.comingSoon) {
+                                            setComingSoonFeature(mode.title);
+                                            setShowComingSoon(true);
+                                        } else {
+                                            navigate(mode.href!);
+                                        }
+                                    }}
+                                    variant={mode.comingSoon ? 'secondary' : 'primary'}
+                                >
+                                    {mode.buttonText}
+                                    {!mode.comingSoon && <ChevronRight className="w-4 h-4" />}
+                                </Button>
                             </div>
                         ))}
                     </motion.div>
@@ -261,6 +283,17 @@ export default function Dashboard() {
                     </div>
                 </div>
             )}
+
+            {/* Coming Soon Dialog */}
+            <ConfirmDialog
+                isOpen={showComingSoon}
+                title="Coming Soon!"
+                message={`${comingSoonFeature} is currently under development and will be available soon.\n\nWe're working hard to bring you this feature. Stay tuned for updates!`}
+                confirmText="Got it"
+                cancelText=""
+                onConfirm={() => setShowComingSoon(false)}
+                onCancel={() => setShowComingSoon(false)}
+            />
         </AppLayout>
     );
 }
