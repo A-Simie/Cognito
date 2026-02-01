@@ -11,22 +11,22 @@ const FEATURES = [
         icon: Play,
         title: 'Video Intelligence',
         description: 'Transform passive viewing into active learning. Cognito breaks down complex videos into manageable concepts with interactive dialogue.',
-        gradient: 'from-blue-600 to-cyan-500',
-        className: 'md:col-span-2',
+        gradient: 'from-blue-600 to-blue-700',
+        className: '',
     },
     {
         icon: FileText,
         title: 'Document Analysis',
         description: 'Process hundreds of pages in seconds. Extract insights and clarify complex segments instantly.',
-        gradient: 'from-blue-500 to-blue-600',
-        className: 'md:col-span-1',
+        gradient: 'from-blue-600 to-blue-700',
+        className: '',
     },
     {
         icon: Sparkles,
         title: 'Adaptive Learning',
         description: 'Master any subject. Cognito architects a progressive learning path tailored to your current knowledge for maximum efficiency.',
-        gradient: 'from-blue-600 to-blue-400',
-        className: 'md:col-span-3',
+        gradient: 'from-blue-600 to-blue-700',
+        className: '',
     },
 ];
 
@@ -188,9 +188,9 @@ export default function Landing() {
                             className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5"
                         >
                             <Link to="/signup" className="w-full sm:w-auto">
-                                <Button className="w-full h-14 px-10 rounded-2xl bg-blue-600 text-white font-black text-lg hover:bg-blue-700 transition-all border-t border-white/10">
+                                <button className="w-full h-14 px-10 rounded-2xl bg-blue-700 text-white font-black text-lg hover:bg-blue-700 transition-all border-t border-white/10">
                                     Start Learning
-                                </Button>
+                                </button>
                             </Link>
                             <Link to="/login" className="w-full sm:w-auto">
                                 <button className="w-full h-14 px-10 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-all font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3">
