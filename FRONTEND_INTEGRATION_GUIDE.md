@@ -1,8 +1,10 @@
 # Cognito Backend API Documentation
 ## Complete Frontend Integration Guide
 
-**Base URL:** `/cognito/api/v1`  
-**WebSocket URL:** `ws://[host]/ws/lesson/{sessionId}?token={JWT_TOKEN}`
+**Production URL:** `https://ubiquitous-waffle-6qvpjpg6gwxhpw6-8080.app.github.dev`  
+**Base Path:** `/cognito/api/v1`  
+**Full API URL:** `https://ubiquitous-waffle-6qvpjpg6gwxhpw6-8080.app.github.dev/cognito/api/v1`  
+**WebSocket URL:** `wss://ubiquitous-waffle-6qvpjpg6gwxhpw6-8080.app.github.dev/ws/lesson/{sessionId}?token={JWT_TOKEN}`
 
 ---
 
