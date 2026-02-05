@@ -29,13 +29,4 @@ export const APP_CONFIG = {
   chatScrollBehavior: 'smooth' as ScrollBehavior,
 } as const;
 
-export const MOCK_USER = {
-  id: '550e8400-e29b-41d4-a716-446655440000',
-  name: 'Alex',
-  email: 'alex@example.com',
-  avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAiTUnDm4p2IU6CpVMJnnPcbxFTLX0Ayre7AoEn0VStjfAB1TRCNhb_IHBqqyLE6g-ezNhYIZVzwYLFWXLRBp5EJuA__WTG3l19JybfB4qV8WGL9HBVFpHL0e3gnZhN5Mw6-ObciTopWm3SlOB3ke4HyqS7QwNqr-Zz7czYgvrPZ2ohsYFVfkywBiwFmyDyW1u2S4kAArKK2DK5sirKhCAzNGIqUfZGkA4f62JQ8vRCGjUUvG_VTdSFz0acIgbVNPxrjbwht0e9Sv8Z',
-  preferences: {
-    theme: 'light' as const,
-    difficulty: 'intermediate' as const,
-  },
-};
+export const AJIBADE_AVATAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDkH0kka7DRgS-jI7Ly3Of2i2wqkEdRvuAbPmhSPvb0UK1bQ8j5N9IKTM_osJ2ZJjMeyr-uKs50xFNFKGocFqESzHXw6y8_U1OVb95PYLYshFSMqAfK_sqprcZRIEm1swDinLba1DP2flEI7gg2gcP_sBmTW36RDuuOh5Zc8PtkfxdunITyPK2Un-ZvNycNDJmBqfa1FKWvAIwOoglokkaoonVbXUzYa_gL8O_eDfMA9cpJwQgf4ks9BbNOIzr-qz-3iHEov1jxzIz9';

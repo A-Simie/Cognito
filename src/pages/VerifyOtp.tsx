@@ -1,99 +1,110 @@
+
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { MockAuthService } from '@/services/mockAuth';
-import { setToken } from '@/lib/auth';
-import { useUser } from '@/contexts/UserContext'; // Import useUser
-import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { ArrowLeft, KeyRound, CheckCircle2 } from 'lucide-react';
 
-export default function VerifyOtp() {
+interface VerifyOtpProps {
+    type?: 'signup' | 'login';
+}
+
+export default function VerifyOtp({ type }: VerifyOtpProps) {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { refreshUser } = useUser(); // Get refreshUser function
+    const { verifySignup, verifyLogin, verifyResetPassword } = useAuth();
+    
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
-    const [mode, setMode] = useState<'signup' | 'login' | 'reset'>('signup');
     const [newPassword, setNewPassword] = useState('');
-    const [loading, setLoading] = useState(false); // Add loading state
+    const [mode, setMode] = useState<'signup' | 'login' | 'reset'>(type || 'signup');
 
     useEffect(() => {
         const e = searchParams.get('email');
         const m = searchParams.get('mode');
         if (e) setEmail(e);
         if (m) setMode(m as any);
-    }, [searchParams]);
+        if (type) setMode(type);
+    }, [searchParams, type]);
 
-    const handleVerify = async (e: React.FormEvent) => {
+    const handleVerify = (e: React.FormEvent) => {
         e.preventDefault();
-        if (loading) return; // Prevent double submission
-
-        setLoading(true);
-        try {
-            if (mode === 'reset') {
-                const result = await MockAuthService.verifyResetOTP({ email, otp, newPassword });
-                if (result.success) {
-                    alert("Password reset successfully. Please login.");
-                    navigate('/login', { replace: true });
-                } else {
-                    alert(result.message);
-                }
-                return;
-            }
-
-            const result = await MockAuthService.verifyOTP({ email, otp });
-            if (result.success && result.token) {
-                setToken(result.token);
-                await refreshUser(); // Load user profile after setting token
-                navigate('/dashboard', { replace: true });
-            } else {
-                alert(result.message);
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Verification failed. Check OTP.");
-        } finally {
-            setLoading(false);
+        
+        if (mode === 'signup') {
+            verifySignup.mutate({ email, otp });
+        } else if (mode === 'login') {
+            verifyLogin.mutate({ email, otp });
+        } else if (mode === 'reset') {
+            verifyResetPassword.mutate({ email, otp, newPassword });
         }
     };
 
+    const isLoading = verifySignup.isPending || verifyLogin.isPending || verifyResetPassword.isPending;
+    const title = mode === 'reset' ? 'Reset Password' : 'Audit Verification';
+    const subTitle = mode === 'reset' ? 'Set your new secure password' : 'Enter the code sent to your email';
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
-                <button
+        <div className="min-h-screen bg-white dark:bg-[#02040a] text-slate-900 dark:text-white flex items-center justify-center p-4">
+            <div className="w-full max-w-md">
+                 <button
                     type="button"
-                    onClick={() => navigate('/login', { replace: true })}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-primary transition-colors mb-6"
+                    onClick={() => navigate('/login')}
+                    className="mb-8 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-widest"
                 >
-                    <ArrowLeft className="w-4 h-4" /> Back to Login
+                    <ArrowLeft className="w-4 h-4" /> Back
                 </button>
-                <h1 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">
-                    Verify OTP
-                </h1>
-                <p className="text-center text-gray-500 mb-6">Sent to {email}</p>
-                <p className="text-center text-xs text-primary font-bold mb-4 bg-primary/10 p-2 rounded-lg">
-                    🎭 Mock Mode: Use OTP <code className="font-mono bg-white/50 px-2 py-1 rounded">123456</code>
-                </p>
-                <form onSubmit={handleVerify} className="space-y-4">
-                    <Input
-                        label="OTP Code"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        placeholder="Enter 8-digit code"
-                    />
-                    {mode === 'reset' && (
+
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 p-8 rounded-[32px] shadow-2xl relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+                    <div className="flex flex-col items-center mb-8 text-center relative z-10">
+                        <div className="w-16 h-16 rounded-2xl bg-blue-600/10 flex items-center justify-center mb-6">
+                            {mode === 'reset' ? <KeyRound className="w-8 h-8 text-blue-600" /> : <CheckCircle2 className="w-8 h-8 text-blue-600" />}
+                        </div>
+                        <h1 className="text-3xl font-black tracking-tight mb-2">{title}</h1>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium">{subTitle}</p>
+                        <div className="mt-2 px-3 py-1 bg-blue-500/10 rounded-full text-blue-600 dark:text-blue-400 text-xs font-bold font-mono">
+                            {email}
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleVerify} className="space-y-5 relative z-10">
                         <Input
-                            label="New Password"
-                            type="password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            placeholder="New Password"
+                            label="Verification Code"
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            placeholder="• • • • • • • •"
+                            className="text-center tracking-[0.5em] font-mono text-lg font-bold"
+                            maxLength={8}
+                            required
                         />
-                    )}
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? 'Verifying...' : 'Verify'}
-                    </Button>
-                </form>
+                        
+                        {mode === 'reset' && (
+                            <Input
+                                label="New Password"
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                placeholder="Min. 8 characters"
+                                required
+                            />
+                        )}
+
+                        <Button 
+                            type="submit" 
+                            className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest text-sm"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Verifying...' : 'Verify Securely'}
+                        </Button>
+                    </form>
+                </motion.div>
             </div>
         </div>
     );

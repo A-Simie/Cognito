@@ -1,46 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowLeft, BookOpen, Lightbulb, Zap, Brain, GraduationCap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { MockBackend } from '@/services/mockBackend';
+import { Button } from '@/components/ui/Button';
 
 export function TopicSelection() {
     const [topic, setTopic] = useState('');
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
-        if (!topic.trim() || loading) return;
+        if (!topic.trim()) return;
 
-        setLoading(true);
-        try {
-            const newClass = await MockBackend.generatePlan(topic);
-
-            let displayTitle = newClass.title;
-            try {
-                if (typeof newClass.title === 'string' && newClass.title.startsWith('{')) {
-                    const parsed = JSON.parse(newClass.title);
-                    displayTitle = parsed.topicText || newClass.title;
-                }
-            } catch {
-                displayTitle = newClass.title;
-            }
-
-            localStorage.setItem('currentClassId', newClass.id.toString());
-
-            navigate('/classes', {
-                state: {
-                    newClassId: newClass.id,
-                    message: `"${displayTitle}" class created! Click to view curriculum.`
-                },
-                replace: true
-            });
-        } catch (error) {
-            console.error('Failed to create class:', error);
-            alert('Failed to create class. Please try again.');
-            setLoading(false);
-        }
+        navigate('/teach-me/generating', { state: { topic } });
     };
 
     const suggestions = [
@@ -108,21 +79,14 @@ export function TopicSelection() {
                                 />
                                 <Button
                                     type="submit"
-                                    disabled={!topic.trim() || loading}
+                                    disabled={!topic.trim()}
                                     size="lg"
                                     className="h-14 px-8 rounded-xl bg-gradient-to-r from-primary to-indigo-500 hover:from-primary-dark hover:to-indigo-600 text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
                                 >
-                                    {loading ? (
-                                        <>
-                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            Creating...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Teach Me
-                                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                        </>
-                                    )}
+                                    <>
+                                        Teach Me
+                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    </>
                                 </Button>
                             </div>
                         </div>

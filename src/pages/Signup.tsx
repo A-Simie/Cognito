@@ -1,152 +1,98 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GraduationCap, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { MockAuthService } from '@/services/mockAuth';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 export default function Signup() {
     const [formData, setFormData] = useState({ fullName: '', email: '', password: '' });
-    const [isLoading, setIsLoading] = useState(false);
-    const [errors, setErrors] = useState<{ fullName?: string; email?: string; password?: string }>({});
+    const { signup } = useAuth();
     const navigate = useNavigate();
 
-    const validate = () => {
-        const nextErrors: { fullName?: string; email?: string; password?: string } = {};
-        const fullName = formData.fullName.trim();
-        const email = formData.email.trim();
-        const password = formData.password.trim();
-
-        if (!fullName) {
-            nextErrors.fullName = 'Full name is required';
-        } else if (fullName.length < 2) {
-            nextErrors.fullName = 'Full name must be at least 2 characters';
-        }
-
-        if (!email) {
-            nextErrors.email = 'Email is required';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            nextErrors.email = 'Enter a valid email address';
-        }
-
-        if (!password) {
-            nextErrors.password = 'Password is required';
-        } else if (password.length < 6) {
-            nextErrors.password = 'Password must be at least 6 characters';
-        }
-
-        setErrors(nextErrors);
-        return Object.keys(nextErrors).length === 0;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!validate()) return;
-        setIsLoading(true);
-        try {
-            const result = await MockAuthService.signup(formData);
-            if (result.success) {
-                navigate(`/verify-otp?email=${formData.email}&mode=signup`);
-            } else {
-                alert(result.message);
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Signup failed");
-        } finally {
-            setIsLoading(false);
-        }
+        signup.mutate(formData);
     };
 
     return (
-        <div className="min-h-screen bg-background-light dark:bg-background-dark text-gray-900 dark:text-white">
-            <div className="max-w-6xl mx-auto px-4 py-8">
-                <div className="flex items-center justify-between mb-8">
-                    <button
-                        type="button"
-                        onClick={() => navigate('/', { replace: true })}
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-primary transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" /> Back to Home
-                    </button>
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                            <GraduationCap className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-black uppercase tracking-tight">Cognito</span>
-                    </div>
-                </div>
+        <div className="min-h-screen bg-white dark:bg-[#02040a] text-slate-900 dark:text-white flex items-center justify-center p-4 relative overflow-hidden font-['Outfit']">
+             {/* Simple background effect */}
+             <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2" />
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2" />
+            </div>
 
-                <div className="flex justify-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="w-full max-w-md"
-                    >
-                        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 backdrop-blur-sm">
-                    <div className="flex flex-col items-center mb-8">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shadow-lg mb-4">
-                            <GraduationCap className="w-8 h-8 text-white" />
+            <div className="w-full max-w-md relative z-10">
+                <button
+                    onClick={() => navigate('/')}
+                    className="mb-8 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-widest"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Home
+                </button>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 p-8 md:p-10 rounded-[32px] shadow-2xl backdrop-blur-xl"
+                >
+                    <div className="flex flex-col items-center mb-10">
+                        <div className="w-16 h-16 rounded-2xl bg-slate-900 dark:bg-white flex items-center justify-center shadow-lg mb-6">
+                            <GraduationCap className="w-8 h-8 text-white dark:text-slate-900" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create Account</h1>
+                        <h1 className="text-3xl font-black tracking-tight mb-2">Join Cognito.</h1>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-center">Unlock your full learning potential today.</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         <Input
                             label="Full Name"
                             value={formData.fullName}
-                            onChange={(e) => {
-                                setFormData({ ...formData, fullName: e.target.value });
-                                if (errors.fullName) setErrors({ ...errors, fullName: undefined });
-                            }}
-                            icon={<User className="w-5 h-5" />}
-                            error={errors.fullName}
+                            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                            icon={<User className="w-5 h-5 text-slate-400" />}
                             required
                         />
-                        <Input
-                            label="Email"
+                         <Input
+                            label="Email Address"
                             type="email"
                             value={formData.email}
-                            onChange={(e) => {
-                                setFormData({ ...formData, email: e.target.value });
-                                if (errors.email) setErrors({ ...errors, email: undefined });
-                            }}
-                            icon={<Mail className="w-5 h-5" />}
-                            error={errors.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            icon={<Mail className="w-5 h-5 text-slate-400" />}
                             required
                         />
-                        <Input
+                         <Input
                             label="Password"
                             type="password"
                             value={formData.password}
-                            onChange={(e) => {
-                                setFormData({ ...formData, password: e.target.value });
-                                if (errors.password) setErrors({ ...errors, password: undefined });
-                            }}
-                            icon={<Lock className="w-5 h-5" />}
-                            error={errors.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            icon={<Lock className="w-5 h-5 text-slate-400" />}
                             required
                         />
-                        <div className="flex items-start gap-3 pt-2">
-                            <input type="checkbox" required className="mt-0.5" />
-                            <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400">
-                                I agree to the{' '}
-                                <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
-                                {' '}and{' '}
-                                <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-                            </label>
+                        
+                        <div className="text-xs text-slate-500 leading-relaxed px-2">
+                            By adding your credentials, you agree to our <Link to="/terms" className="underline hover:text-blue-600">Terms</Link> and <Link to="/privacy" className="underline hover:text-blue-600">Privacy Policy</Link>.
                         </div>
-                        <Button type="submit" className="w-full" size="lg" loading={isLoading}>
-                            Sign Up
+
+                        <Button 
+                            type="submit" 
+                            className="w-full h-14 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl"
+                            disabled={signup.isPending}
+                        >
+                            {signup.isPending ? 'Creating Account...' : 'Get Started'}
                         </Button>
                     </form>
-                    <p className="text-center text-sm text-gray-500 mt-6">
-                        Already have an account? <Link to="/login" className="text-primary font-bold">Sign In</Link>
-                    </p>
-                </div>
-                    </motion.div>
-                </div>
+
+                    <div className="mt-8 pt-8 border-t border-slate-100 dark:border-white/5 text-center">
+                        <p className="text-sm font-medium text-slate-500">
+                            Already a member?{' '}
+                            <Link to="/login" className="text-slate-900 dark:text-white font-bold hover:underline">
+                                Sign In
+                            </Link>
+                        </p>
+                    </div>
+                </motion.div>
             </div>
         </div>
     );

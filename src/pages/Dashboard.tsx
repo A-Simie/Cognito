@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -7,11 +8,11 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { StatsCard, RecentActivity } from '@/components/shared';
 import { ConfirmDialog } from '@/components/dialog/ConfirmDialog';
-import { cn } from '@/lib/utils';
-import { auth, learning } from '@/lib/api'; // Added 'auth' import
-import { useUser } from '@/contexts/UserContext';
+import { cn, formatDate } from '@/lib/utils';
+import { authService } from '@/lib/services/authService';
+import { classService } from '@/lib/services/classService';
+import { useAuthStore } from '@/lib/store/authStore';
 
-// Utility to format minutes (backend Long) into "5h 30m"
 const formatTime = (minutes: number) => {
     if (!minutes) return '0h';
     const h = Math.floor(minutes / 60);
@@ -25,7 +26,7 @@ const LEARNING_MODES = [
         title: 'YouTube Tutor',
         description: 'Turn any video into an interactive lesson with real-time quizzes and notes.',
         icon: Play,
-        href: null, // Coming soon
+        href: null,
         buttonText: 'Coming Soon',
         gradient: 'from-red-500/10 to-pink-500/10',
         hoverBorder: 'hover:border-red-200',
@@ -38,7 +39,7 @@ const LEARNING_MODES = [
         title: 'PDF Tutor',
         description: 'Upload readings and documents to get instant summaries and key takeaways.',
         icon: Upload,
-        href: null, // Coming soon
+        href: null,
         buttonText: 'Coming Soon',
         gradient: 'from-blue-500/10 to-indigo-500/10',
         hoverBorder: 'hover:border-blue-200',
@@ -63,10 +64,7 @@ const LEARNING_MODES = [
 
 const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: { staggerChildren: 0.1 },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const itemVariants = {
@@ -75,9 +73,9 @@ const itemVariants = {
 };
 
 export default function Dashboard() {
-    const { user, refreshUser } = useUser(); // Use context
+    const { user, checkAuth } = useAuthStore();
     const navigate = useNavigate();
-    const [recentActivity, setRecentActivity] = useState([]);
+    const [recentActivity, setRecentActivity] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showGoalPrompt, setShowGoalPrompt] = useState(false);
     const [goalInput, setGoalInput] = useState('');
@@ -90,7 +88,15 @@ export default function Dashboard() {
 
     const loadData = async () => {
         try {
-            const activity = await learning.getRecentActivity().catch(() => []);
+            const classes = await classService.getRecentClasses().catch(() => []);
+            const activity = classes.map((cls: any) => ({
+                id: cls.id.toString(),
+                title: cls.title,
+                type: cls.learningMode === 'YOUTUBE_TUTOR' ? 'Video' : cls.learningMode === 'PDF_TUTOR' ? 'PDF' : 'Quiz',
+                thumbnail: '',
+                progress: cls.classCompletionPercentage || 0,
+                timeAgo: formatDate(new Date(cls.updatedAt))
+            }));
             setRecentActivity(activity);
         } catch (e) {
             console.error("Failed to load data", e);
@@ -111,10 +117,10 @@ export default function Dashboard() {
     const handleGoalSubmit = async () => {
         if (!goalInput) return;
         try {
-            await auth.updateProfile({ weeklyGoalHours: parseInt(goalInput) });
+            await authService.updateProfile({ weeklyGoalHours: parseInt(goalInput) });
             setShowGoalPrompt(false);
             localStorage.setItem('weeklyGoalPrompted', 'true');
-            await refreshUser(); // Refresh user profile to update stats
+            await checkAuth(); // Refresh user profile updates
             loadData(); // Refresh to update UI
         } catch (e) {
             console.error("Failed to save goal", e);
@@ -123,9 +129,9 @@ export default function Dashboard() {
 
     if (loading) return <div className="p-10 text-center">Loading...</div>;
 
-    const stats = user?.stats || {};
-    const weeklyGoalHours = stats.weeklyGoalHours || 1; // Avoid div/0
-    const currentHours = Math.floor((stats.totalMinutesSpent || 0) / 60);
+    const stats = user?.stats;
+    const weeklyGoalHours = stats?.weeklyGoalHours || 1;
+    const currentHours = Math.floor((stats?.totalMinutesSpent || 0) / 60);
     const goalProgress = Math.min(100, Math.round((currentHours / weeklyGoalHours) * 100));
 
     return (
@@ -147,7 +153,7 @@ export default function Dashboard() {
                             <div className="space-y-2">
                                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 text-xs font-bold uppercase tracking-wider mb-2">
                                     <Flame className="w-4 h-4" />
-                                    <span>{stats.currentStreak || 0} Day Streak</span>
+                                    <span>{stats?.currentStreak || 0} Day Streak</span>
                                 </div>
                                 <h1 className="text-3xl md:text-4xl font-bold leading-tight">
                                     Welcome back, {user?.fullName}!
@@ -160,26 +166,20 @@ export default function Dashboard() {
                                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex flex-col items-center justify-center min-w-[120px]">
                                     <span className="text-3xl font-bold">{goalProgress}%</span>
                                     <span className="text-xs text-indigo-100 uppercase tracking-wide">
-                                        Weekly Goal ({stats.weeklyGoalHours || '?'}h)
+                                        Weekly Goal ({stats?.weeklyGoalHours || '?'}h)
                                     </span>
                                 </div>
                             </div>
                         </div>
                     </motion.section>
 
-                    <motion.div
-                        variants={itemVariants}
-                        className="flex items-center justify-between"
-                    >
+                    <motion.div variants={itemVariants} className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                             Choose Learning Mode
                         </h2>
                     </motion.div>
 
-                    <motion.div
-                        variants={itemVariants}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-6"
-                    >
+                    <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {LEARNING_MODES.map((mode) => (
                             <div
                                 key={mode.id}
@@ -190,20 +190,15 @@ export default function Dashboard() {
                                     mode.hoverBorder
                                 )}
                             >
-                                <div
-                                    className={cn(
-                                        'absolute top-0 right-0 w-32 h-32 bg-gradient-to-br rounded-full blur-2xl -mr-10 -mt-10',
-                                        'group-hover:scale-150 transition-transform duration-500',
-                                        mode.gradient
-                                    )}
-                                />
-                                <div
-                                    className={cn(
-                                        'mb-6 w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center',
-                                        mode.iconBg,
-                                        mode.iconColor
-                                    )}
-                                >
+                                <div className={cn(
+                                    'absolute top-0 right-0 w-32 h-32 bg-gradient-to-br rounded-full blur-2xl -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-500',
+                                    mode.gradient
+                                )} />
+                                <div className={cn(
+                                    'mb-6 w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center',
+                                    mode.iconBg,
+                                    mode.iconColor
+                                )}>
                                     <mode.icon className="w-7 h-7" />
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
@@ -238,21 +233,21 @@ export default function Dashboard() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <StatsCard
                                 icon={<Check className="w-5 h-5" />}
-                                value={stats.lessonsCompleted || 0}
+                                value={stats?.lessonsCompleted || 0}
                                 label="Lessons Done"
                                 iconBgColor="bg-green-100 dark:bg-green-900/30"
                                 iconColor="text-green-600"
                             />
                             <StatsCard
                                 icon={<Clock className="w-5 h-5" />}
-                                value={formatTime(stats.totalMinutesSpent || 0)}
+                                value={formatTime(stats?.totalMinutesSpent || 0)}
                                 label="Hours Spent"
                                 iconBgColor="bg-indigo-100 dark:bg-indigo-900/30"
                                 iconColor="text-indigo-600"
                             />
                             <StatsCard
                                 icon={<Flame className="w-5 h-5" />}
-                                value={stats.currentStreak || 0}
+                                value={stats?.currentStreak || 0}
                                 label="Current Streak"
                                 iconBgColor="bg-orange-100 dark:bg-orange-900/30"
                                 iconColor="text-orange-600"
@@ -266,7 +261,6 @@ export default function Dashboard() {
                 </motion.div>
             </motion.div>
 
-            {/* Goal Prompt Modal (Inline for simplicity) */}
             {showGoalPrompt && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl">
@@ -284,7 +278,6 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* Coming Soon Dialog */}
             <ConfirmDialog
                 isOpen={showComingSoon}
                 title="Coming Soon!"

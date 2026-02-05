@@ -1,71 +1,122 @@
-import { useEffect, useState, useCallback } from 'react';
-import { MockBackend } from '@/services/mockBackend';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
-interface PlanStep {
-    id: number;
-    stepIndex: number;
-    stepType: string;
-    stepStatus: string;
+const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'wss://ubiquitous-waffle-6qvpjpg6gwxhpw6-8080.app.github.dev/ws/lesson/';
+
+export interface LessonStep {
+    id: string;
+    stepType: 'NORMAL' | 'CLARIFICATION' | 'CONCLUSION';
     stepPayload: {
-        textToSpeak?: string;
+        textToSpeak: string;
         canvasHtmlContent?: string;
-        conversationQuestion?: string;
+        quizzesJson?: any[];
     };
 }
 
-export const useLessonWebSocket = (sessionId: string | null) => {
-    const [steps, setSteps] = useState<PlanStep[]>([]);
+export function useLessonWebSocket(sessionId: string | null) {
+    const socketRef = useRef<WebSocket | null>(null);
+    const [steps, setSteps] = useState<LessonStep[]>([]);
     const [isConnected, setIsConnected] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [currentAudioStep, setCurrentAudioStep] = useState<number | null>(null);
-    const [completedAudioSteps, setCompletedAudioSteps] = useState<Set<number>>(new Set());
+    const [currentAudioStep] = useState<string | null>(null);
+    const [completedAudioSteps, setCompletedAudioSteps] = useState<Set<string>>(new Set());
+    const [clarificationResponse, setClarificationResponse] = useState<LessonStep | null>(null);
+    const [isLoadingClarification, setIsLoadingClarification] = useState(false);
 
     useEffect(() => {
         if (!sessionId) return;
 
-        let isMounted = true;
+        const token = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1];
+        
+        if (!token) {
+            console.error("No auth token found for WS connection");
+            return;
+        }
 
-        setIsConnected(false);
-        setError(null);
+        const wsUrl = `${WS_BASE_URL}${sessionId}?token=${token}`;
+        const ws = new WebSocket(wsUrl);
+        socketRef.current = ws;
 
-        MockBackend.getSessionSteps(sessionId)
-            .then((data) => {
-                if (!isMounted) return;
-                setSteps(data || []);
-                setIsConnected(true);
-                setCompletedAudioSteps(new Set((data || []).map(step => step.id)));
-                setCurrentAudioStep(null);
-            })
-            .catch(() => {
-                if (!isMounted) return;
-                setError('Failed to load session');
-                setIsConnected(false);
-            });
+        ws.onopen = () => {
+            console.log("WS Connected");
+            setIsConnected(true);
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                handleMessage(message);
+            } catch (e) {
+                console.error("Failed to parse WS message", e);
+            }
+        };
+
+        ws.onclose = () => {
+            console.log("WS Disconnected");
+            setIsConnected(false);
+        };
+
+        ws.onerror = (error) => {
+            console.error("WS Error", error);
+        };
 
         return () => {
-            isMounted = false;
+            ws.close();
         };
-    }, [sessionId]); // Only reconnect when sessionId changes, NOT when audio handlers change
+    }, [sessionId]);
 
-    // Send step completion to backend
-    const sendStepCompleted = useCallback((stepId: number) => {
-        setCompletedAudioSteps(prev => new Set([...prev, stepId]));
+    const handleMessage = (message: any) => {
+        switch (message.type) {
+            case 'NEXT_STEP':
+                if (message.step) {
+                    const stepWithId = { ...message.step, id: Date.now().toString() };
+                    setSteps(prev => [...prev, stepWithId]);
+                }
+                break;
+            case 'CLARIFICATION_RESPONSE':
+                if (message.step) {
+                    const stepWithId = { ...message.step, id: Date.now().toString() };
+                    setClarificationResponse(stepWithId);
+                    setIsLoadingClarification(false);
+                }
+                break;
+            case 'LOAD_INSTRUCTION':
+                setIsLoadingClarification(true);
+                break;
+            case 'AUDIO_CHUNK':
+                break;
+            case 'AUDIO_END':
+                 if (steps.length > 0) {
+                     const lastStep = steps[steps.length - 1];
+                     if (lastStep) {
+                        setCompletedAudioSteps(prev => new Set(prev).add(lastStep.id));
+                     }
+                 }
+                break;
+            default:
+                console.log("Unhandled WS message", message.type);
+        }
+    };
+
+    const sendStepCompleted = useCallback(() => {
+        socketRef.current?.send(JSON.stringify({ type: 'STEP_COMPLETED', data: {} }));
     }, []);
 
-    // Send keepalive ping
-    const sendPing = useCallback(() => {}, []);
+    const sendMessage = useCallback((type: string, data: any) => {
+        socketRef.current?.send(JSON.stringify({ type, data }));
+    }, []);
 
-    const replayAudio = useCallback(() => {}, []);
+    const clearClarification = useCallback(() => {
+        setClarificationResponse(null);
+    }, []);
 
     return {
-        ws: null,
         steps,
         isConnected,
-        error,
         sendStepCompleted,
-        sendPing,
-        currentAudioStep,        // Track which step is playing audio
-        completedAudioSteps,     // Set of steps with completed audio
-        replayAudio              // Function to replay audio (Come Again)
+        sendMessage,
+        currentAudioStep,
+        completedAudioSteps,
+        clarificationResponse,
+        isLoadingClarification,
+        clearClarification,
     };
-};
+}

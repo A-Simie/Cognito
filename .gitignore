@@ -50,3 +50,4 @@ stitch_ajibade_youtube_tutor_interface
 # package-lock.json
 # yarn.lock
 # pnpm-lock.yaml
+.env

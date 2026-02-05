@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MockBackend } from '@/services/mockBackend';
+import { classService } from '@/lib/services/classService';
 import { LoadingScreen } from '@/components/lesson/LoadingScreen';
 
 export function SessionSetup() {
@@ -25,18 +25,15 @@ export function SessionSetup() {
             }
 
             try {
-                // Show initial progress  
                 setLoadingProgress(5);
                 setLoadingMessage('Initializing session...');
 
-                // Small delay for UX
                 await new Promise(resolve => setTimeout(resolve, 300));
 
                 setLoadingProgress(30);
                 setLoadingMessage('Creating your learning session...');
 
-                // Start lesson - mock backend creates session
-                const response = await MockBackend.startLesson(classId, unitId);
+                const response = await classService.startLesson(classId, unitId);
 
                 setLoadingProgress(70);
                 setLoadingMessage('Loading lesson content...');
@@ -49,14 +46,11 @@ export function SessionSetup() {
                 setLoadingProgress(100);
                 setLoadingMessage('Ready! Starting lesson...');
 
-                // Brief pause before navigation for smooth transition
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // Navigate to lesson session
                 navigate(`/teach-me/session/${sessionId}`, { replace: true });
 
             } catch (error) {
-                console.error('Failed to start lesson:', error);
                 navigate('/teach-me/class/units');
             }
         };

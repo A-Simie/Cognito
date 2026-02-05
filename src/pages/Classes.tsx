@@ -5,28 +5,30 @@ import { BookOpen, Plus, Play, Check, X } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { learning } from '@/lib/api';
+import { classService } from '@/lib/services/classService';
+import { Class } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 export default function Classes() {
-    const [classes, setClasses] = useState<any[]>([]);
+    const [classes, setClasses] = useState<Class[]>([]);
     const [loading, setLoading] = useState(true);
     const { state } = useLocation();
     const [showBanner, setShowBanner] = useState(!!state?.message);
     const newClassId = state?.newClassId;
 
     useEffect(() => {
-        // Always use real API
-        learning.getClasses()
+        classService.getClasses()
             .then(setClasses)
-            .catch(() => setClasses([]))
+            .catch((err) => {
+                console.error(err);
+                setClasses([]);
+            })
             .finally(() => setLoading(false));
     }, []);
 
     return (
         <AppLayout>
             <div className="max-w-[1440px] mx-auto p-6 lg:p-10">
-                {/* Success Banner */}
                 <AnimatePresence>
                     {showBanner && state?.message && (
                         <motion.div
@@ -78,7 +80,7 @@ export default function Classes() {
                     </div>
                 ) : classes.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {classes.map((cls: any, i: number) => {
+                        {classes.map((cls: Class, i: number) => {
                             const isNew = newClassId === cls.id;
                             const progress = cls.classCompletionPercentage || 0;
                             const hasProgress = progress > 0;
@@ -90,12 +92,10 @@ export default function Classes() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.1 }}
                                 >
-                                    {/* ✅ Wrap entire card in Link for full clickability */}
                                     <Link
                                         to="/teach-me/class/units"
                                         className="block group"
                                         onClick={() => {
-                                            // Store classId for LessonUnitsList to use
                                             localStorage.setItem('currentClassId', cls.id.toString());
                                         }}
                                     >
@@ -173,7 +173,6 @@ export default function Classes() {
                         })}
                     </div>
                 ) : (
-                    // Empty State
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}

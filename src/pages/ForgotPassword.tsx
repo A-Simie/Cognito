@@ -3,24 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { MockAuthService } from '@/services/mockAuth';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
     const navigate = useNavigate();
+    const { resetPassword } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        try {
-            const result = await MockAuthService.requestPasswordReset({ email });
-            if (result.success) {
-                navigate(`/verify-otp?email=${email}&mode=reset`);
-            } else {
-                alert(result.message);
-            }
-        } catch (error) {
-            alert('Failed to send OTP.');
-        }
+        resetPassword.mutate(email);
     };
 
     return (

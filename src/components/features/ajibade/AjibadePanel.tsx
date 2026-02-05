@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { Send, Mic, MicOff, Plus } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import { MessageBubble } from './MessageBubble';
-import { TypingIndicator } from './TypingIndicator';
 import { cn } from '@/lib/utils';
 
 interface Message {
@@ -12,12 +11,14 @@ interface Message {
     timestamp: string;
 }
 
+import { AJIBADE_AVATAR } from '@/lib/constants';
+
 interface AjibadePanelProps {
     className?: string;
+    onSendMessage: (message: string) => void;
+    clarificationResponse?: { stepPayload: { textToSpeak: string } } | null;
+    isLoadingClarification?: boolean;
 }
-
-const AJIBADE_AVATAR =
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuDkH0kka7DRgS-jI7Ly3Of2i2wqkEdRvuAbPmhSPvb0UK1bQ8j5N9IKTM_osJ2ZJjMeyr-uKs50xFNFKGocFqESzHXw6y8_U1OVb95PYLYshFSMqAfK_sqprcZRIEm1swDinLba1DP2flEI7gg2gcP_sBmTW36RDuuOh5Zc8PtkfxdunITyPK2Un-ZvNycNDJmBqfa1FKWvAIwOoglokkaoonVbXUzYa_gL8O_eDfMA9cpJwQgf4ks9BbNOIzr-qz-3iHEov1jxzIz9';
 
 const INITIAL_MESSAGES: Message[] = [
     {
@@ -28,10 +29,14 @@ const INITIAL_MESSAGES: Message[] = [
     },
 ];
 
-export function AjibadePanel({ className }: AjibadePanelProps) {
+export function AjibadePanel({ 
+    className, 
+    onSendMessage, 
+    clarificationResponse, 
+    isLoadingClarification 
+}: AjibadePanelProps) {
     const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
     const [input, setInput] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const chatRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +44,19 @@ export function AjibadePanel({ className }: AjibadePanelProps) {
         if (chatRef.current) {
             chatRef.current.scrollTop = chatRef.current.scrollHeight;
         }
-    }, [messages, isTyping]);
+    }, [messages]);
+
+    useEffect(() => {
+        if (clarificationResponse) {
+            const aiMessage: Message = {
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: clarificationResponse.stepPayload.textToSpeak,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            };
+            setMessages((prev) => [...prev, aiMessage]);
+        }
+    }, [clarificationResponse]);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -53,19 +70,8 @@ export function AjibadePanel({ className }: AjibadePanelProps) {
         };
 
         setMessages((prev) => [...prev, userMessage]);
+        onSendMessage(input.trim());
         setInput('');
-        setIsTyping(true);
-
-        setTimeout(() => {
-            setIsTyping(false);
-            const aiMessage: Message = {
-                id: (Date.now() + 1).toString(),
-                role: 'assistant',
-                content: "That's a great question! Let me help you understand this concept better.",
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            };
-            setMessages((prev) => [...prev, aiMessage]);
-        }, 1500);
     };
 
     const toggleRecording = () => {
@@ -116,7 +122,16 @@ export function AjibadePanel({ className }: AjibadePanelProps) {
                         avatar={message.role === 'assistant' ? AJIBADE_AVATAR : undefined}
                     />
                 ))}
-                {isTyping && <TypingIndicator />}
+                {isLoadingClarification && (
+                    <div className="flex items-center gap-2 text-slate-400">
+                        <div className="flex gap-1">
+                            <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                            <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                            <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        <span className="text-sm">Ajibade is thinking...</span>
+                    </div>
+                )}
             </div>
 
             {/* Input Area */}

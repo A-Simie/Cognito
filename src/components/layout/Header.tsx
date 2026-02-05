@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { GraduationCap, Menu, X } from 'lucide-react';
+
 import { Avatar } from '@/components/ui/Avatar';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { cn } from '@/lib/utils';
-import { useUser } from '@/contexts/UserContext';
+import { useAuthStore } from '@/lib/store/authStore';
 
 const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -15,7 +16,7 @@ const navLinks = [
 export function Header() {
     const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { user } = useUser(); // Use context instead of API call
+    const { user } = useAuthStore();
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -68,7 +69,7 @@ export function Header() {
                         <ThemeToggle />
 
                         <Avatar
-                            src={user?.profilePicture} // Base64 or URL
+                            src={user?.profilePicture}
                             alt={user?.fullName || 'User'}
                             size="sm"
                             className="cursor-pointer hidden sm:block"

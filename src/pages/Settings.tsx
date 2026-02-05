@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/Input';
 import { Avatar } from '@/components/ui/Avatar';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';
-import { auth } from '@/lib/api';
-import { removeToken } from '@/lib/auth';
-import { useUser } from '@/contexts/UserContext';
+import { authService } from '@/lib/services/authService';
+import { useAuthStore } from '@/lib/store/authStore';
+import { useNavigate } from 'react-router-dom';
 
 const MENU_ITEMS = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -21,14 +21,15 @@ const MENU_ITEMS = [
 export default function Settings() {
     const [activeTab, setActiveTab] = useState('profile');
     const { theme, setTheme } = useTheme();
-    const { user, refreshUser } = useUser(); // Use context instead of API call
+    const { user, checkAuth, logout } = useAuthStore();
     const [loading, setLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const navigate = useNavigate();
 
     const handleLogout = () => {
-        removeToken();
-        window.location.assign('/login');
+        logout();
+        navigate('/login');
     };
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,9 +51,9 @@ export default function Settings() {
         if (!selectedImage) return;
         setLoading(true);
         try {
-            await auth.updateProfile({ profilePicture: selectedImage });
+            await authService.updateProfile({ base64Image: selectedImage });
             // Refresh user context
-            await refreshUser();
+            await checkAuth();
             setSelectedImage(null);
             alert("Profile updated successfully!");
         } catch (e) {
