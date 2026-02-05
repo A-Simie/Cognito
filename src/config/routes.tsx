@@ -1,4 +1,5 @@
 import { lazy, ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
 
 // Lazy load pages for better performance
 const Landing = lazy(() => import('@/pages/Landing'));
@@ -16,6 +17,8 @@ const Privacy = lazy(() => import('@/pages/Privacy'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
+
+
 export interface AppRoute {
     path: string;
     element: ReactNode;
@@ -32,6 +35,7 @@ export const publicRoutes: AppRoute[] = [
         element: <Landing />,
         title: 'Home',
     },
+
     {
         path: '/signup',
         element: <Signup />,

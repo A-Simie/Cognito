@@ -17,9 +17,9 @@ export function SessionSetup() {
             }
 
             const classId = parseInt(localStorage.getItem('currentClassId') || '0');
-            const unitId = state.unit.id;
+            const unitIndex = state.unit.unitOrder;
 
-            if (!unitId || !classId) {
+            if (unitIndex === undefined || !classId) {
                 navigate('/classes');
                 return;
             }
@@ -33,7 +33,7 @@ export function SessionSetup() {
                 setLoadingProgress(30);
                 setLoadingMessage('Creating your learning session...');
 
-                const response = await classService.startLesson(classId, unitId);
+                const response = await classService.startLesson(classId, unitIndex);
 
                 setLoadingProgress(70);
                 setLoadingMessage('Loading lesson content...');

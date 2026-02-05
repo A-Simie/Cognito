@@ -5,6 +5,8 @@ import { Lock, PlayCircle, CheckCircle, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LessonUnit } from '@/lib/types';
 
+
+
 export function LessonUnitsList() {
     const navigate = useNavigate();
     const [units, setUnits] = useState<LessonUnit[]>([]);
@@ -13,6 +15,9 @@ export function LessonUnitsList() {
 
     useEffect(() => {
         const storedClassId = localStorage.getItem('currentClassId');
+
+
+
         if (!storedClassId) {
             navigate('/classes');
             return;
@@ -31,11 +36,11 @@ export function LessonUnitsList() {
                     } else {
                         extractedUnits = cls.lessonUnits || [];
                     }
-                    
+
                     extractedUnits.sort((a, b) => a.unitOrder - b.unitOrder);
-                    
+
                     setUnits(extractedUnits);
-                    
+
                     try {
                         if (cls.title.startsWith('{')) {
                             const parsed = JSON.parse(cls.title);
@@ -84,51 +89,77 @@ export function LessonUnitsList() {
 
             <div className="flex-1 overflow-y-auto custom-scrollbar p-6 max-w-4xl mx-auto w-full">
                 <div className="flex flex-col gap-3 pb-6">
-                    {units.length > 0 ? units.map((unit) => {
+                    {units.length > 0 ? units.map((unit, idx) => {
                         const isCompleted = unit.unitStatus === 'COMPLETED';
                         const isCurrent = unit.unitStatus === 'IN_PROGRESS';
-                        const isLocked = false;
+                        // Logic: Locked if not first unit AND previous unit is not completed
+                        const prevUnit = idx > 0 ? units[idx - 1] : null;
+                        const isLocked = idx > 0 && prevUnit?.unitStatus !== 'COMPLETED';
 
                         return (
                             <button
-                                key={unit.unitOrder} 
+                                key={unit.unitOrder}
                                 disabled={isLocked}
                                 onClick={() => handleUnitClick(unit)}
                                 className={cn(
-                                    "group w-full p-4 rounded-xl border-2 flex items-center justify-between text-left transition-all duration-300 bg-white dark:bg-transparent",
+                                    "group w-full p-5 rounded-2xl border-2 flex items-center justify-between text-left transition-all duration-300",
                                     isCurrent
-                                        ? "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500 shadow-md"
+                                        ? "bg-primary/5 dark:bg-primary/10 border-primary shadow-lg ring-1 ring-primary/20 scale-[1.02]"
                                         : isCompleted
-                                            ? "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                                            : "border-gray-100 dark:border-gray-800 opacity-80 hover:opacity-100 hover:border-gray-200 dark:hover:border-gray-700"
+                                            ? "bg-white dark:bg-slate-900 border-emerald-100 dark:border-emerald-900/30 hover:border-emerald-200 dark:hover:border-emerald-800"
+                                            : isLocked
+                                                ? "bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 opacity-60 cursor-not-allowed"
+                                                : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-primary/50 hover:shadow-md"
                                 )}
                             >
                                 <div className="flex items-center gap-4">
                                     <div className={cn(
-                                        "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm",
-                                        isCurrent ? "bg-indigo-500 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-500"
+                                        "w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg transition-transform group-hover:scale-110",
+                                        isCurrent ? "bg-primary text-white" :
+                                            isCompleted ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" :
+                                                "bg-slate-100 dark:bg-slate-800 text-slate-500"
                                     )}>
                                         {unit.unitOrder + 1}
                                     </div>
                                     <div>
                                         <h3 className={cn(
-                                            "font-bold text-base mb-1 text-gray-900 dark:text-white",
-                                            isCompleted && "text-gray-500 dark:text-gray-400"
+                                            "font-bold text-lg mb-1 transition-colors",
+                                            isCurrent ? "text-primary" :
+                                                isLocked ? "text-slate-400 dark:text-slate-600" :
+                                                    "text-slate-900 dark:text-white"
                                         )}>
                                             {unit.title}
                                         </h3>
-                                        <div className="flex items-center gap-2 text-xs text-gray-500 font-medium uppercase tracking-wider">
-                                            <span>{unit.unitType || 'Lesson'}</span>
-                                            {/* Duration logic if available */}
+                                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                                            <span className={isCurrent ? "text-primary/70" : "text-slate-400"}>
+                                                {unit.unitType || 'Lesson'}
+                                            </span>
+                                            {isCompleted && <span className="text-emerald-500 italic lowercase font-medium">— completed</span>}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="text-gray-400 dark:text-gray-500">
-                                    {isLocked && <Lock className="w-5 h-5" />}
-                                    {isCompleted && <CheckCircle className="w-6 h-6 text-green-500" />}
-                                    {isCurrent && <PlayCircle className="w-8 h-8 text-indigo-500 group-hover:scale-110 transition-transform" />}
-                                    {!isLocked && !isCompleted && !isCurrent && <PlayCircle className="w-5 h-5 opacity-0 group-hover:opacity-50 transition-opacity" />}
+                                <div className="flex items-center justify-center min-w-[40px]">
+                                    {isLocked && (
+                                        <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-400">
+                                            <Lock className="w-5 h-5" />
+                                        </div>
+                                    )}
+                                    {isCompleted && (
+                                        <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-emerald-500">
+                                            <CheckCircle className="w-6 h-6" />
+                                        </div>
+                                    )}
+                                    {isCurrent && (
+                                        <div className="p-2 bg-primary/10 rounded-lg text-primary animate-pulse">
+                                            <PlayCircle className="w-8 h-8" />
+                                        </div>
+                                    )}
+                                    {!isLocked && !isCompleted && !isCurrent && (
+                                        <div className="p-2 text-slate-300 group-hover:text-primary transition-colors">
+                                            <PlayCircle className="w-6 h-6" />
+                                        </div>
+                                    )}
                                 </div>
                             </button>
                         );

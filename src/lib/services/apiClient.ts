@@ -2,7 +2,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://ubiquitous-waffle-6qvpjpg6gwxhpw6-8080.app.github.dev/cognito/api/v1';
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/cognito/api/v1';
 
 const apiClient = axios.create({
   baseURL: API_URL,
