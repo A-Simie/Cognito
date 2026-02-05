@@ -51,7 +51,7 @@ export default function VerifyOtp({ type }: VerifyOtpProps) {
                  <button
                     type="button"
                     onClick={() => navigate('/login')}
-                    className="mb-8 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-widest"
+                    className="mb-8 flex items-center cursor-pointer gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-widest"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back
                 </button>

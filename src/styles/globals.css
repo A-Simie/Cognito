@@ -1,76 +1,173 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  html {
-    font-family: 'Outfit', 'Inter', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    scroll-behavior: smooth;
+@theme {
+  /* Colors */
+  --color-primary: #4F46E5;
+  --color-primary-dark: #3730A3;
+  --color-primary-light: #A5B4FC;
+
+  --color-background-light: #F8FAFC;
+  --color-background-dark: #0F172A;
+  --color-background-night: #020617;
+
+  --color-card-light: #FFFFFF;
+  --color-card-dark: #1E293B;
+  --color-card-night: #0F172A;
+
+  --color-surface-light: #f9fafb;
+  --color-surface-dark: #1e1b4b;
+
+  --color-success: #10B981;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+
+  /* Font families */
+  --font-sans: 'Outfit', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Border radius */
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+
+  /* Shadows */
+  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 15px rgba(79, 70, 229, 0.3);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  /* Animations */
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-fade-in: fadeIn 0.2s ease-in;
+  --animate-pulse-glow: pulseGlow 4s ease-in-out infinite;
+  --animate-bounce-in: bounceIn 0.5s ease-out;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes slideUp {
+    0% {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 
-  body {
-    @apply bg-slate-50 text-slate-900;
-    min-height: 100vh;
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
   }
 
-  .dark body {
-    @apply bg-[#020617] text-white;
+  @keyframes pulseGlow {
+
+    0%,
+    100% {
+      box-shadow: 0 0 20px rgba(79, 70, 229, 0.4);
+    }
+
+    50% {
+      box-shadow: 0 0 40px rgba(79, 70, 229, 0.8);
+    }
+  }
+
+  @keyframes bounceIn {
+    0% {
+      transform: scale(0);
+    }
+
+    50% {
+      transform: scale(1.2);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
   }
 }
 
-@layer components {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .chat-scroll::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .chat-scroll::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .chat-scroll::-webkit-scrollbar-thumb {
-    background-color: rgba(79, 70, 229, 0.2);
-    border-radius: 20px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(79, 70, 229, 0.1);
-    border-radius: 20px;
-  }
-
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(79, 70, 229, 0.3);
-  }
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+body {
+  @apply bg-slate-50 text-slate-900;
+  min-height: 100vh;
+}
 
-  .perspective-2000 {
-    perspective: 2000px;
-  }
+.dark body {
+  @apply bg-[#020617] text-white;
+}
 
-  .perspective-1000 {
-    perspective: 1000px;
-  }
+/* Scrollbar utilities */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.2);
+  border-radius: 20px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.1);
+  border-radius: 20px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.3);
+}
+
+/* Utility classes */
+.text-balance {
+  text-wrap: balance;
+}
+
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
 }

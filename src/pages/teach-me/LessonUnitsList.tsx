@@ -74,7 +74,7 @@ export function LessonUnitsList() {
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#1a1b26]">
             {/* Header */}
             <div className="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-800 shrink-0 bg-white/95 dark:bg-[#1a1b26]/95 backdrop-blur-sm sticky top-0 z-10">
-                <button onClick={() => navigate('/classes')} className="p-2 -ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mr-2">
+                <button onClick={() => navigate('/classes')} className="p-2 -ml-2 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mr-2">
                     <ChevronLeft className="w-5 h-5" />
                 </button>
                 <h2 className="font-bold text-lg tracking-tight text-gray-900 dark:text-white truncate">

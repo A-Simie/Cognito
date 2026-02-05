@@ -63,7 +63,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
                                 </h3>
                                 <button
                                     onClick={onClose}
-                                    className="p-1 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    className="p-1 rounded-full cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
                                     aria-label="Close modal"
                                 >
                                     <X className="w-5 h-5" />

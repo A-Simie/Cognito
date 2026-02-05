@@ -1,21 +1,26 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Suspense, useEffect } from 'react';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
-import Landing from '@/pages/Landing';
-import Dashboard from '@/pages/Dashboard';
-import Signup from '@/pages/Signup';
-import Login from '@/pages/Login';
-import VerifyOtp from '@/pages/VerifyOtp';
-import ForgotPassword from '@/pages/ForgotPassword';
-import Classes from '@/pages/Classes';
-import Settings from '@/pages/Settings';
-import QuizMode from '@/pages/QuizMode';
-import TeachMe from '@/pages/TeachMe';
-import Community from '@/pages/Community';
-import Privacy from '@/pages/Privacy';
-import Terms from '@/pages/Terms';
 import { useAuthStore } from '@/lib/store/authStore';
-import { useEffect } from 'react';
+import { publicRoutes, protectedRoutes, notFoundRoute } from '@/config/routes';
 
+/**
+ * Loading fallback component
+ */
+function LoadingFallback() {
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
+            <div className="text-center">
+                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-slate-600 dark:text-slate-400 font-medium">Loading...</p>
+            </div>
+        </div>
+    );
+}
+
+/**
+ * Private route wrapper component
+ */
 function PrivateRoute({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
     
@@ -24,36 +29,43 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
     }, [checkAuth]);
 
     if (isLoading) {
-        return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+        return <LoadingFallback />;
     }
     
-    return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+    return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+/**
+ * Main App component
+ */
 export default function App() {
     return (
         <ThemeProvider>
             <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/login" element={<Login />} />
+                <Suspense fallback={<LoadingFallback />}>
+                    <Routes>
+                        {/* Public routes */}
+                        {publicRoutes.map((route) => (
+                            <Route
+                                key={route.path}
+                                path={route.path}
+                                element={route.element}
+                            />
+                        ))}
 
-                    <Route path="/verify-signup" element={<VerifyOtp type="signup" />} />
-                    <Route path="/verify-login" element={<VerifyOtp type="login" />} />
-                    <Route path="/verify-otp" element={<VerifyOtp />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/privacy" element={<Privacy />} />
-                    <Route path="/terms" element={<Terms />} />
+                        {/* Protected routes */}
+                        {protectedRoutes.map((route) => (
+                            <Route
+                                key={route.path}
+                                path={route.path}
+                                element={<PrivateRoute>{route.element}</PrivateRoute>}
+                            />
+                        ))}
 
-                    <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-                    <Route path="/classes" element={<PrivateRoute><Classes /></PrivateRoute>} />
-                    <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-
-                    <Route path="/quiz" element={<PrivateRoute><QuizMode /></PrivateRoute>} />
-                    <Route path="/teach-me/*" element={<PrivateRoute><TeachMe /></PrivateRoute>} />
-                    <Route path="/community" element={<PrivateRoute><Community /></PrivateRoute>} />
-                </Routes>
+                        {/* 404 Not Found */}
+                        <Route path={notFoundRoute.path} element={notFoundRoute.element} />
+                    </Routes>
+                </Suspense>
             </BrowserRouter>
         </ThemeProvider>
     );

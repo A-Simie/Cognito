@@ -10,7 +10,7 @@ export function ThemeToggle() {
             onClick={toggleTheme}
             className={cn(
                 'p-2 rounded-lg transition-colors',
-                'text-gray-600 dark:text-gray-300',
+                'text-gray-600 cursor-pointer dark:text-gray-300',
                 'hover:bg-gray-100 dark:hover:bg-white/10',
                 'focus:outline-none focus:ring-2 focus:ring-primary/50'
             )}

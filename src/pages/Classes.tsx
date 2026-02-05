@@ -47,7 +47,7 @@ export default function Classes() {
                             </div>
                             <button
                                 onClick={() => setShowBanner(false)}
-                                className="p-1 hover:bg-green-100 dark:hover:bg-green-800 rounded-lg transition-colors"
+                                className="p-1 hover:bg-green-100 cursor-pointer dark:hover:bg-green-800 rounded-lg transition-colors"
                             >
                                 <X className="w-4 h-4 text-green-600 dark:text-green-400" />
                             </button>

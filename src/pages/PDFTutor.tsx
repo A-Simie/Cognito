@@ -45,18 +45,18 @@ export default function PDFTutor() {
             <main className="flex flex-1 overflow-hidden relative">
                 <section className="flex-1 flex flex-col bg-gray-100 dark:bg-gray-900 relative overflow-hidden">
                     <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 bg-white dark:bg-gray-700 p-1.5 rounded-full shadow-lg border border-gray-100 dark:border-gray-600">
-                        <button className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors">
+                        <button className="p-2 text-gray-600 cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors">
                             <ZoomOut className="w-5 h-5" />
                         </button>
                         <span className="text-xs font-medium px-2 min-w-[3rem] text-center dark:text-white">100%</span>
-                        <button className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors">
+                        <button className="p-2 text-gray-600 cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors">
                             <ZoomIn className="w-5 h-5" />
                         </button>
                         <div className="w-px h-4 bg-gray-200 dark:bg-gray-500 mx-1" />
-                        <button className="p-2 text-primary hover:bg-primary/5 rounded-full transition-colors">
+                        <button className="p-2 text-primary cursor-pointer hover:bg-primary/5 rounded-full transition-colors">
                             <Type className="w-5 h-5" />
                         </button>
-                        <button className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors">
+                        <button className="p-2 text-gray-600 cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors">
                             <Highlighter className="w-5 h-5" />
                         </button>
                     </div>
@@ -107,7 +107,10 @@ export default function PDFTutor() {
                 </section>
 
                 {!isMobile && (
-                    <AjibadePanel className="w-[450px] shrink-0 hidden lg:flex" />
+                    <AjibadePanel 
+                        className="w-[450px] shrink-0 hidden lg:flex" 
+                        onSendMessage={(msg) => console.log('PDF Question:', msg)}
+                    />
                 )}
             </main>
 
@@ -120,7 +123,10 @@ export default function PDFTutor() {
                         <MessageCircle className="w-6 h-6" />
                     </button>
                     <BottomSheet isOpen={isAjibadeOpen} onClose={() => setIsAjibadeOpen(false)}>
-                        <AjibadePanel className="h-[70vh] border-0" />
+                        <AjibadePanel 
+                            className="h-[70vh] border-0" 
+                            onSendMessage={(msg) => console.log('PDF Question:', msg)}
+                        />
                     </BottomSheet>
                 </>
             )}

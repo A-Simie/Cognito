@@ -88,7 +88,7 @@ export default function Settings() {
                                         key={item.id}
                                         onClick={() => setActiveTab(item.id)}
                                         className={cn(
-                                            'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors',
+                                            'w-full flex cursor-pointer items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors',
                                             activeTab === item.id
                                                 ? 'bg-primary/10 text-primary'
                                                 : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -172,7 +172,7 @@ export default function Settings() {
                                                 key={t}
                                                 onClick={() => setTheme(t)}
                                                 className={cn(
-                                                    'p-4 rounded-xl border-2 transition-all text-center',
+                                                    'p-4 rounded-xl cursor-pointer border-2 transition-all text-center',
                                                     theme === t
                                                         ? 'border-primary bg-primary/5'
                                                         : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'

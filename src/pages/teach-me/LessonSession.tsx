@@ -60,7 +60,7 @@ export function LessonSession() {
             />
 
             <div className="lesson-header">
-                <button onClick={handleBackClick} className="back-button">
+                <button onClick={handleBackClick} className="back-button cursor-pointer">
                     <ChevronLeft className="w-5 h-5" />
                     Back to Curriculum
                 </button>

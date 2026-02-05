@@ -64,7 +64,7 @@ export default function YouTubeTutor() {
                                     className="w-full h-full object-cover opacity-60"
                                     src={VIDEO_THUMBNAIL}
                                 />
-                                <button className="absolute flex shrink-0 items-center justify-center rounded-full w-20 h-20 bg-primary/90 text-white hover:scale-105 transition-transform shadow-2xl backdrop-blur-sm z-10 group-hover:bg-primary">
+                                <button className="absolute flex cursor-pointer shrink-0 items-center justify-center rounded-full w-20 h-20 bg-primary/90 text-white hover:scale-105 transition-transform shadow-2xl backdrop-blur-sm z-10 group-hover:bg-primary">
                                     <svg className="w-12 h-12 ml-1" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M8 5v14l11-7z" />
                                     </svg>
@@ -120,7 +120,7 @@ export default function YouTubeTutor() {
                                     examples. This forms the bedrock for understanding derivatives in the
                                     next module.
                                 </p>
-                                <button className="mt-2 text-primary text-sm font-semibold hover:underline">
+                                <button className="mt-2 text-primary cursor-pointer text-sm font-semibold hover:underline">
                                     Show more
                                 </button>
                             </div>
@@ -138,13 +138,19 @@ export default function YouTubeTutor() {
                 </main>
 
                 {!isMobile && (
-                    <AjibadePanel className="w-[400px] shrink-0 hidden lg:flex" />
+                    <AjibadePanel 
+                        className="w-[400px] shrink-0 hidden lg:flex" 
+                        onSendMessage={(msg) => console.log('YouTube Question:', msg)}
+                    />
                 )}
             </div>
 
             {isMobile && (
                 <BottomSheet isOpen={isAjibadeOpen} onClose={() => setIsAjibadeOpen(false)}>
-                    <AjibadePanel className="h-[70vh] border-0" />
+                    <AjibadePanel 
+                        className="h-[70vh] border-0" 
+                        onSendMessage={(msg) => console.log('YouTube Question:', msg)}
+                    />
                 </BottomSheet>
             )}
         </div>

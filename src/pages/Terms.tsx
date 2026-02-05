@@ -11,7 +11,7 @@ export default function Terms() {
                 <button
                     type="button"
                     onClick={() => navigate('/signup', { replace: true })}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-primary transition-colors mb-6"
+                    className="inline-flex items-center cursor-pointer gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-primary transition-colors mb-6"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back to Sign Up
                 </button>

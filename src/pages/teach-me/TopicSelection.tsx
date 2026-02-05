@@ -34,7 +34,7 @@ export function TopicSelection() {
             <div className="absolute top-6 left-6 z-10">
                 <button
                     onClick={() => navigate('/dashboard', { replace: true })}
-                    className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/70 hover:text-white transition-all duration-300 backdrop-blur-sm"
+                    className="group flex items-center cursor-pointer gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/70 hover:text-white transition-all duration-300 backdrop-blur-sm"
                 >
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                     <span className="text-sm font-medium">Back</span>
@@ -102,7 +102,7 @@ export function TopicSelection() {
                                 <button
                                     key={label}
                                     onClick={() => setTopic(label)}
-                                    className="group flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/50 text-slate-300 hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/10"
+                                    className="group flex items-center cursor-pointer gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/50 text-slate-300 hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/10"
                                 >
                                     <Icon className="w-4 h-4 text-primary/70 group-hover:text-primary transition-colors" />
                                     <span className="font-medium">{label}</span>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, Play, FileText, ChevronRight, Menu, X, Activity, BookOpen, Brain, Terminal, Search, Clock, Zap, Target } from 'lucide-react';
+import { GraduationCap, Play, FileText, ChevronRight, Menu, X, Activity, BookOpen, Brain, Zap, Target } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { cn } from '@/lib/utils';
@@ -91,7 +91,6 @@ export default function Landing() {
                     <nav className="hidden md:flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                         <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
                         <a href="#workflow" className="hover:text-blue-600 transition-colors">Workflow</a>
-                        <a href="#pricing" className="hover:text-blue-600 transition-colors">Pricing</a>
                     </nav>
 
                     <div className="flex items-center gap-1 md:gap-4">
@@ -125,7 +124,6 @@ export default function Landing() {
                             {[
                                 { t: 'Features', h: '#features' },
                                 { t: 'Workflow', h: '#workflow' },
-                                { t: 'Pricing', h: '#pricing' }
                             ].map((item) => (
                                 <a 
                                     key={item.t} 
@@ -478,7 +476,6 @@ export default function Landing() {
                                 <div className="flex flex-col gap-4 text-sm font-bold tracking-tight text-slate-500">
                                     <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
                                     <a href="#workflow" className="hover:text-blue-600 transition-colors">Workflow</a>
-                                    <a href="#pricing" className="hover:text-blue-600 transition-colors">Pricing</a>
                                 </div>
                             </div>
                             <div className="space-y-6">

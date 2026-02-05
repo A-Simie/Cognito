@@ -20,7 +20,7 @@ export function RecentActivity({ sessions, className }: RecentActivityProps) {
         <div className={cn('bg-white dark:bg-card-dark rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800', className)}>
             <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recent Sessions</h3>
-                <button className="text-primary hover:bg-primary/5 p-1 rounded-md transition-colors">
+                <button className="text-primary hover:bg-primary/5 p-1 cursor-pointer rounded-md transition-colors">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <circle cx="4" cy="10" r="2" />
                         <circle cx="10" cy="10" r="2" />
@@ -87,7 +87,7 @@ export function RecentActivity({ sessions, className }: RecentActivityProps) {
                     </div>
                 )}
             </div>
-            <button className="w-full mt-6 py-2 text-sm font-medium text-gray-500 hover:text-primary transition-colors border border-dashed border-gray-300 dark:border-gray-700 rounded-lg hover:border-primary hover:bg-primary/5">
+            <button className="w-full mt-6 py-2 text-sm cursor-pointer font-medium text-gray-500 hover:text-primary transition-colors border border-dashed border-gray-300 dark:border-gray-700 rounded-lg hover:border-primary hover:bg-primary/5">
                 View Full History
             </button>
         </div>
