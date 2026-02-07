@@ -165,7 +165,7 @@ export default function Landing() {
             <ThemeToggle />
             <div className="hidden md:flex items-center">
               <Link to="/signup">
-                <Button className="h-10 px-6 rounded-full bg-blue-600 dark:bg-white text-white dark:text-black font-black text-[10px] uppercase tracking-wider hover:scale-105 transition-all border-none">
+                <Button className="h-10 px-6 rounded-full bg-blue-600 dark:bg-white text-white dark:text-white font-black text-[10px] uppercase tracking-wider hover:scale-105 transition-all border-none">
                   Get Started
                 </Button>
               </Link>
@@ -313,15 +313,6 @@ export default function Landing() {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="mt-20 md:mt-32 max-w-5xl mx-auto px-4 relative group"
           >
-            <div className="absolute top-10 left-10 md:left-20 z-10 hidden lg:block opacity-40 group-hover:opacity-100 transition-opacity">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-blue-600" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-blue-600">
-                  Cognitive Stream Active
-                </span>
-              </div>
-            </div>
-
             <div className="relative p-1 bg-linear-to-b from-slate-200 dark:from-white/10 to-transparent rounded-3xl md:rounded-[40px] border border-slate-100 dark:border-white/5">
               <div className="bg-slate-50 dark:bg-[#05070a]/80 backdrop-blur-3xl rounded-[28px] md:rounded-[36px] overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl flex flex-col min-h-[400px] lg:aspect-16/10">
                 <div className="h-10 border-b border-slate-200 dark:border-white/5 flex items-center px-4 md:px-6 gap-2 shrink-0">
