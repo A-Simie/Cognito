@@ -1071,7 +1071,7 @@ export default function Landing() {
         </section>
       </main>
 
-      <footer className="py-20 md:py-32 px-6 border-t border-slate-100 dark:border-white/5 bg-slate-50/20 dark:bg-transparent">
+      <footer className="relative z-10 py-20 md:py-32 px-6 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-[#02040c]">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between gap-16 md:gap-24">
             <div className="max-w-sm">
@@ -1079,32 +1079,36 @@ export default function Landing() {
                 <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
                   <GraduationCap className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-black tracking-tight uppercase">
+                <span className="text-xl font-black tracking-tight uppercase text-slate-900 dark:text-white">
                   Cognito
                 </span>
               </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                Redefining the architecture of human knowledge acquisition
+                through neural synthesis and adaptive mastery.
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-12 md:gap-20">
               <div className="space-y-6">
                 <p className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-600">
                   Platform
                 </p>
-                <div className="flex flex-col gap-4 text-sm font-bold tracking-tight text-slate-500">
+                <div className="flex flex-col gap-4 text-sm font-bold tracking-tight text-slate-500 dark:text-slate-400">
                   <a
-                    href="/#features"
-                    className="hover:text-blue-600 transition-colors"
+                    href="#features"
+                    className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
                   >
                     Features
                   </a>
                   <a
-                    href="/#ecosystem"
-                    className="hover:text-blue-600 transition-colors"
+                    href="#ecosystem"
+                    className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
                   >
                     Ecosystem
                   </a>
                   <a
-                    href="/#workflow"
-                    className="hover:text-blue-600 transition-colors"
+                    href="#workflow"
+                    className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
                   >
                     Workflow
                   </a>
@@ -1112,23 +1116,32 @@ export default function Landing() {
               </div>
               <div className="space-y-6">
                 <p className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-600">
-                  Institutional
+                  Legal
                 </p>
-                <div className="flex flex-col gap-4 text-sm font-bold tracking-tight text-slate-500">
-                  <a href="#" className="hover:text-blue-600 transition-colors">
-                    Privacy
-                  </a>
-                  <a href="#" className="hover:text-blue-600 transition-colors">
-                    Terms
-                  </a>
+                <div className="flex flex-col gap-4 text-sm font-bold tracking-tight text-slate-500 dark:text-slate-400">
+                  <Link
+                    to="/privacy"
+                    className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
+                  >
+                    Privacy Policy
+                  </Link>
+                  <Link
+                    to="/terms"
+                    className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
+                  >
+                    Terms of Service
+                  </Link>
                 </div>
               </div>
             </div>
           </div>
           <div className="mt-20 md:mt-24 pt-10 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
-            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-400">
-              © {new Date().getFullYear()} Cognito
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-400 dark:text-slate-500">
+              © {new Date().getFullYear()} Cognito Inc.
             </p>
+            <div className="flex items-center gap-6">
+              {/* Socials or extra links could go here */}
+            </div>
           </div>
         </div>
       </footer>
