@@ -87,8 +87,8 @@ export default function Landing() {
     offset: ["start start", "end start"],
   });
 
-  const mockupY = useTransform(scrollYProgress, [0, 1], [0, -60]);
-  const innerMockupY = useTransform(scrollYProgress, [0, 1], [0, -5]);
+  const mockupY = useTransform(scrollYProgress, [0, 1], [0, -120]);
+  const innerMockupY = useTransform(scrollYProgress, [0, 1], [0, -40]);
 
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
@@ -99,9 +99,9 @@ export default function Landing() {
     offset: ["start end", "end start"],
   });
 
-  const ecoY1 = useTransform(ecoScroll, [0, 1], [0, -20]);
-  const ecoY2 = useTransform(ecoScroll, [0, 1], [0, -10]);
-  const ecoY3 = useTransform(ecoScroll, [0, 1], [0, -30]);
+  const ecoY1 = useTransform(ecoScroll, [0, 1], [0, -60]);
+  const ecoY2 = useTransform(ecoScroll, [0, 1], [0, -30]);
+  const ecoY3 = useTransform(ecoScroll, [0, 1], [0, -80]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
