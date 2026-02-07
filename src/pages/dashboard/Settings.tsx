@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Avatar } from "@/components/ui/Avatar";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/lib/hooks/layout/useTheme";
 import { cn } from "@/lib/utils/utils";
 import { authService } from "@/lib/services/authService";
 import { useAuthStore } from "@/lib/store/authStore";

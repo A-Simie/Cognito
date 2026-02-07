@@ -15,17 +15,17 @@ interface StepAudioState {
     expectedChunkIndex: number;
     isAppending: boolean;
     hasError: boolean;
-    cachedChunks: Uint8Array[];  // For replay
+    cachedChunks: Uint8Array[];
 }
 
 interface AudioStreamingCallbacks {
-    onAudioComplete?: (stepId: number) => void;  // Enable Next button
-    onAudioStart?: (stepId: number) => void;     // Notify audio started
+    onAudioComplete?: (stepId: number) => void; 
+    onAudioStart?: (stepId: number) => void;     
 }
 
 export const useAudioStreaming = (callbacks?: AudioStreamingCallbacks) => {
     const activeAudioStreams = useRef<Map<number, StepAudioState>>(new Map());
-    const stepAudioCache = useRef<Map<number, Uint8Array[]>>(new Map());  // Persistent cache for replay
+    const stepAudioCache = useRef<Map<number, Uint8Array[]>>(new Map()); 
 
     const handleAudioChunk = useCallback((data: AudioChunkData) => {
         const { stepId, chunkIndex, audioData } = data;
