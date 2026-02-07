@@ -1,6 +1,11 @@
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import {
   GraduationCap,
   Play,
@@ -74,18 +79,37 @@ export default function Landing() {
   const [scrolled, setScrolled] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  const mockupY = useTransform(scrollYProgress, [0, 1], [0, -120]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   return (
-    <div className="min-h-screen bg-white dark:bg-[#02040a] text-slate-900 dark:text-white selection:bg-blue-500/30 font-['Outfit'] overflow-x-hidden">
-      {/* Structural Grid Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.04),transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.06),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-size-[3rem_3rem]" />
+    <div className="min-h-screen bg-slate-50 dark:bg-[#02040c] text-slate-900 dark:text-white selection:bg-blue-500/30 font-['Outfit'] overflow-x-hidden relative">
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-slate-50 dark:bg-[#02040c]" />
+
+        <div className="absolute inset-0 opacity-40 dark:opacity-40">
+          <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.12)_0%,transparent_70%)] blur-[140px]" />
+          <div className="absolute top-[10%] right-[-20%] w-[60%] h-[60%] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1)_0%,transparent_70%)] blur-[120px]" />
+          <div className="absolute bottom-[-20%] left-[10%] w-[80%] h-[80%] bg-[radial-gradient(circle_at_center,rgba(29,78,216,0.08)_0%,transparent_70%)] blur-[160px]" />
+        </div>
+
+        <div className="absolute inset-0 bg-[radial-gradient(50%_45%_at_50%_0%,rgba(59,130,246,0.1)_0%,transparent_100%)] dark:bg-[radial-gradient(50%_45%_at_50%_0%,rgba(59,130,246,0.18)_0%,transparent_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-15%,rgba(37,99,235,0.06)_0%,transparent_100%)] dark:bg-[radial-gradient(ellipse_70%_60%_at_50%_-15%,rgba(37,99,235,0.12)_0%,transparent_100%)]" />
+
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.01)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[6rem_6rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+
+        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       </div>
 
       <header
@@ -160,7 +184,6 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -208,41 +231,35 @@ export default function Landing() {
               Next-Generation Learning
             </motion.div>
 
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={{
-                visible: {
-                  transition: {
-                    staggerChildren: 0.08,
-                  },
-                },
-              }}
-            >
-              <h1 className="text-4xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-[-0.04em] mb-8 md:mb-12 max-w-5xl mx-auto">
-                {["Master", "any", "topic."].map((word, i) => (
+            <motion.div style={{ opacity, scale }}>
+              <h1 className="text-4xl md:text-7xl lg:text-9xl font-black leading-[0.9] tracking-[-0.05em] mb-8 md:mb-12 max-w-6xl mx-auto">
+                {["The", "Intelligence", "Layer."].map((word, i) => (
                   <motion.span
                     key={i}
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      visible: { opacity: 1, y: 0 },
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.8,
+                      delay: i * 0.1,
+                      ease: [0.16, 1, 0.3, 1],
                     }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     className="inline-block mr-[0.2em]"
                   >
                     {word}
                   </motion.span>
                 ))}
                 <br className="hidden md:block" />
-                <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 via-sky-500 to-blue-600 dark:from-blue-400 dark:via-sky-300 dark:to-blue-400 bg-size-[200%_auto] animate-gradient-x">
-                  {["In", "half", "the", "time."].map((word, i) => (
+                <span className="text-transparent bg-clip-text bg-linear-to-b from-blue-700 via-blue-600 to-blue-800 bg-size-[200%_auto] animate-gradient-x drop-shadow-[0_0_20px_rgba(37,99,235,0.2)]">
+                  {["Master", "Any", "Topic."].map((word, i) => (
                     <motion.span
                       key={i}
-                      variants={{
-                        hidden: { opacity: 0, y: 20 },
-                        visible: { opacity: 1, y: 0 },
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.8,
+                        delay: 0.4 + i * 0.1,
+                        ease: [0.16, 1, 0.3, 1],
                       }}
-                      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                       className="inline-block mr-[0.2em]"
                     >
                       {word}
@@ -253,18 +270,19 @@ export default function Landing() {
             </motion.div>
 
             <motion.p
+              style={{ opacity }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
                 duration: 0.8,
-                delay: 0.6,
+                delay: 0.8,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="text-base md:text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto mb-10 md:mb-16 font-medium leading-relaxed tracking-tight px-4"
+              className="text-base md:text-xl text-slate-400 max-w-3xl mx-auto mb-10 md:mb-16 font-medium leading-relaxed tracking-tight px-4"
             >
-              Tired of drowning in long videos and dry PDFs? Cognito transforms
-              your links and files into interactive AI tutors that actually make
-              sense. No more skipping, no more confusion.
+              Cognito is an AI-powered educational platform for self-directed
+              learners. Transform YouTube videos, PDFs, and any documentation
+              into personalized lessons with your AI study partner, Ajibade.
             </motion.p>
 
             <motion.div
@@ -274,12 +292,12 @@ export default function Landing() {
               className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5"
             >
               <Link to="/signup" className="w-full sm:w-auto">
-                <button className="w-full h-14 px-10 rounded-2xl bg-blue-700 text-white font-black text-lg hover:bg-blue-700 transition-all border-t border-white/10">
+                <button className="w-full h-14 px-10 rounded-2xl cursor-pointer bg-blue-700 text-white font-black text-lg hover:bg-blue-900 transition-all border-t border-white/10">
                   Start Learning
                 </button>
               </Link>
               <Link to="/login" className="w-full sm:w-auto">
-                <button className="w-full h-14 px-10 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-all font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3">
+                <button className="w-full h-14 px-10 rounded-2xl cursor-pointer border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-all font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3">
                   <Play className="w-3 h-3 fill-current" />
                   Watch Overview
                 </button>
@@ -288,13 +306,13 @@ export default function Landing() {
           </div>
 
           <motion.div
+            style={{ y: mockupY }}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="mt-20 md:mt-32 max-w-5xl mx-auto px-4 relative group"
           >
-            {/* Static App Header Details */}
             <div className="absolute top-10 left-10 md:left-20 z-10 hidden lg:block opacity-40 group-hover:opacity-100 transition-opacity">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-blue-600" />
@@ -318,7 +336,6 @@ export default function Landing() {
                   </div>
                 </div>
                 <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-                  {/* Sidebar Preview */}
                   <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/5 p-4 flex flex-col gap-4">
                     <div className="p-3 rounded-xl bg-blue-600/5 border border-blue-500/10">
                       <div className="flex items-center gap-3 mb-3">
@@ -344,11 +361,9 @@ export default function Landing() {
                       ))}
                     </div>
                   </div>
-                  {/* Content Area Preview */}
                   <div className="flex-1 p-6 md:p-10 flex flex-col gap-8 relative overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.03),transparent)]" />
 
-                    {/* Chat Simulation Inside Content Area */}
                     <div className="relative z-20 space-y-3 pointer-events-none">
                       <motion.div
                         initial={{ opacity: 0, x: -10, y: 10 }}
@@ -429,7 +444,6 @@ export default function Landing() {
                       </div>
                     </div>
 
-                    {/* Bottom Chat Bar Preview */}
                     <div className="mt-auto h-12 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/3 flex items-center px-4 gap-3 shadow-sm relative z-20">
                       <div className="w-48 h-2 bg-slate-200 dark:bg-white/5 rounded-full" />
                       <div className="ml-auto w-10 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
@@ -474,7 +488,7 @@ export default function Landing() {
               {/* Feature 1: Topic Tutor - Large Square */}
               <motion.div
                 whileHover={{ y: -5 }}
-                className="md:col-span-3 lg:col-span-4 row-span-2 group relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all"
+                className="md:col-span-3 lg:col-span-4 cursor-pointer row-span-2 group relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all"
               >
                 <div className="relative z-10">
                   <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center mb-8 shadow-lg shadow-blue-500/20">
@@ -496,7 +510,7 @@ export default function Landing() {
               {/* Feature 2: YouTube Tutor - Wide */}
               <motion.div
                 whileHover={{ y: -5 }}
-                className="md:col-span-3 lg:col-span-8 group relative overflow-hidden rounded-[2.5rem] bg-[#f8fafc] dark:bg-blue-900/10 border border-slate-200 dark:border-blue-500/10 p-10 flex flex-col md:flex-row gap-8 items-center shadow-sm hover:shadow-2xl transition-all"
+                className="md:col-span-3 lg:col-span-8 cursor-pointer group relative overflow-hidden rounded-[2.5rem] bg-[#f8fafc] dark:bg-blue-900/10 border border-slate-200 dark:border-blue-500/10 p-10 flex flex-col md:flex-row gap-8 items-center shadow-sm hover:shadow-2xl transition-all"
               >
                 <div className="flex-1 relative z-10">
                   <div className="w-12 h-12 rounded-xl bg-red-500 flex items-center justify-center mb-6 shadow-lg shadow-red-500/20">
@@ -520,7 +534,7 @@ export default function Landing() {
               {/* Feature 3: PDF Tutor - Small */}
               <motion.div
                 whileHover={{ y: -5 }}
-                className="md:col-span-3 lg:col-span-4 group relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all"
+                className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all"
               >
                 <div className="w-12 h-12 rounded-xl bg-sky-500 flex items-center justify-center mb-6">
                   <FileText className="w-6 h-6 text-white" />
@@ -539,7 +553,7 @@ export default function Landing() {
               {/* Feature 4: Ajibade - Wide/Medium */}
               <motion.div
                 whileHover={{ y: -5 }}
-                className="md:col-span-3 lg:col-span-4 group relative overflow-hidden rounded-[2.5rem] bg-blue-600 p-10 flex flex-col justify-between shadow-xl shadow-blue-500/20 transition-all"
+                className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[2.5rem] bg-blue-600 p-10 flex flex-col justify-between shadow-xl shadow-blue-500/20 transition-all"
               >
                 <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-xl flex items-center justify-center mb-6">
                   <Sparkles className="w-6 h-6 text-white" />
@@ -561,7 +575,7 @@ export default function Landing() {
               {/* Feature 5: Quizzes - Vertical */}
               <motion.div
                 whileHover={{ y: -5 }}
-                className="md:col-span-3 lg:col-span-4 group relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all"
+                className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all"
               >
                 <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center mb-6">
                   <Target className="w-6 h-6 text-white" />
@@ -580,7 +594,7 @@ export default function Landing() {
               {/* Feature 6: Analytics - Wide */}
               <motion.div
                 whileHover={{ y: -5 }}
-                className="md:col-span-6 lg:col-span-8 group relative overflow-hidden rounded-[2.5rem] bg-slate-900 dark:bg-slate-900 border border-slate-800 p-10 flex flex-col md:flex-row gap-8 items-center shadow-2xl transition-all"
+                className="md:col-span-6 lg:col-span-8 cursor-pointer group relative overflow-hidden rounded-[2.5rem] bg-slate-900 dark:bg-slate-900 border border-slate-800 p-10 flex flex-col md:flex-row gap-8 items-center shadow-2xl transition-all"
               >
                 <div className="flex-1">
                   <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center mb-6">
@@ -613,7 +627,7 @@ export default function Landing() {
               {/* Feature 7: Real-time - Small */}
               <motion.div
                 whileHover={{ y: -5 }}
-                className="md:col-span-6 lg:col-span-4 group relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all"
+                className="md:col-span-6 lg:col-span-4 group cursor-pointer relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all"
               >
                 <div className="w-12 h-12 rounded-xl bg-yellow-500 flex items-center justify-center mb-6">
                   <Zap className="w-6 h-6 text-white" />
