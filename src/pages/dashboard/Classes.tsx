@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Plus, Play, Check, X } from 'lucide-react';
+import { BookOpen, Plus, Play, Check, X, FileText, Youtube } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { classService } from '@/lib/services/classService';
 import { Class } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { ConfirmDialog } from '@/components/dialog/ConfirmDialog';
 
 export default function Classes() {
     const [classes, setClasses] = useState<Class[]>([]);
     const [loading, setLoading] = useState(true);
     const { state } = useLocation();
+    const navigate = useNavigate();
     const [showBanner, setShowBanner] = useState(!!state?.message);
+    const [showCreateDialog, setShowCreateDialog] = useState(false);
     const newClassId = state?.newClassId;
 
     useEffect(() => {
@@ -26,9 +29,71 @@ export default function Classes() {
             .finally(() => setLoading(false));
     }, []);
 
+    // Creation Dialog Component inline for simplicity (or can be separate)
+    const CreationDialog = () => (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl p-6 border border-slate-100 dark:border-slate-800"
+            >
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Create New Class</h2>
+                    <button onClick={() => setShowCreateDialog(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="grid gap-4">
+                    <button
+                        onClick={() => navigate('/teach-me/topic')}
+                        className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                            <BookOpen className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">From a Topic</h3>
+                            <p className="text-sm text-slate-500">Let AI generate a curriculum from any topic you choose.</p>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => navigate('/teach-me/youtube-setup')}
+                        className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-red-500/50 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all text-left"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform">
+                            <Youtube className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-600 transition-colors">From YouTube</h3>
+                            <p className="text-sm text-slate-500">Turn any YouTube video into an interactive lesson.</p>
+                        </div>
+                    </button>
+
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-[1px] rounded-xl z-10 flex items-center justify-center">
+                            <span className="bg-slate-200 dark:bg-slate-800 text-slate-500 text-xs font-bold px-2 py-1 rounded-md">Coming Soon</span>
+                        </div>
+                        <button disabled className="w-full flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 opacity-60 text-left">
+                            <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                                <FileText className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-slate-900 dark:text-white">From PDF</h3>
+                                <p className="text-sm text-slate-500">Upload a document to get summaries and quizzes.</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
+        </div>
+    );
+
     return (
         <AppLayout>
-            <div className="max-w-[1440px] mx-auto p-6 lg:p-10">
+            <div className="max-w-[1440px] mx-auto p-6 lg:p-10 relative">
                 <AnimatePresence>
                     {showBanner && state?.message && (
                         <motion.div
@@ -66,11 +131,12 @@ export default function Classes() {
                             Track your enrolled courses and progress
                         </p>
                     </div>
-                    <Link to="/teach-me/topic">
-                        <Button className="shadow-lg shadow-primary/20">
-                            <Plus className="w-4 h-4" /> Create New Class
-                        </Button>
-                    </Link>
+                    <Button
+                        onClick={() => setShowCreateDialog(true)}
+                        className="shadow-lg shadow-primary/20"
+                    >
+                        <Plus className="w-4 h-4 mr-2" /> Create New Class
+                    </Button>
                 </motion.div>
 
                 {loading ? (
@@ -84,6 +150,10 @@ export default function Classes() {
                             const isNew = newClassId === cls.id;
                             const progress = cls.classCompletionPercentage || 0;
                             const hasProgress = progress > 0;
+
+                            // Determine icon based on mode
+                            const ModeIcon = cls.learningMode === 'YOUTUBE_TUTOR' ? Youtube :
+                                cls.learningMode === 'PDF_TUTOR' ? FileText : BookOpen;
 
                             return (
                                 <motion.div
@@ -101,10 +171,15 @@ export default function Classes() {
                                     >
                                         <Card
                                             variant="interactive"
-                                            className="p-5 bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800 shadow-soft hover:shadow-lg transition-shadow"
+                                            className="p-5 bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800 shadow-soft hover:shadow-lg transition-shadow relative overflow-hidden"
                                         >
-                                            <div className="flex items-center justify-between mb-3">
-                                                <h3 className="font-bold text-lg text-gray-900 dark:text-white line-clamp-1">
+                                            {/* Mode Indicator */}
+                                            <div className="absolute top-0 right-0 p-2 opacity-5">
+                                                <ModeIcon className="w-24 h-24" />
+                                            </div>
+
+                                            <div className="flex items-center justify-between mb-3 relative z-10">
+                                                <h3 className="font-bold text-lg text-gray-900 dark:text-white line-clamp-1 pr-4">
                                                     {(() => {
                                                         try {
                                                             if (typeof cls.title === 'string' && cls.title.startsWith('{')) {
@@ -118,22 +193,26 @@ export default function Classes() {
                                                     })()}
                                                 </h3>
                                                 {isNew && (
-                                                    <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
+                                                    <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 shrink-0">
                                                         NEW
                                                     </span>
                                                 )}
                                             </div>
 
-                                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4 relative z-10">
                                                 <span className="flex items-center gap-1.5">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                                                     {cls.classStatus || 'ACTIVE'}
                                                 </span>
                                                 <span>•</span>
                                                 <span>{cls.lessons || 0} units</span>
+                                                <span>•</span>
+                                                <span className="uppercase font-bold tracking-wider text-[10px]">
+                                                    {cls.learningMode?.replace('_TUTOR', '') || 'TOPIC'}
+                                                </span>
                                             </div>
 
-                                            <div className="mb-4">
+                                            <div className="mb-4 relative z-10">
                                                 <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
                                                     <span>Progress</span>
                                                     <span className="font-bold">{Math.round(progress)}%</span>
@@ -141,7 +220,7 @@ export default function Classes() {
                                                 <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
                                                     <div
                                                         className={cn(
-                                                            "h-full rounded-full",
+                                                            "h-full rounded-full transition-all duration-500",
                                                             progress === 100
                                                                 ? "bg-linear-to-r from-green-500 to-emerald-500"
                                                                 : "bg-linear-to-r from-primary to-indigo-500"
@@ -151,7 +230,7 @@ export default function Classes() {
                                                 </div>
                                             </div>
 
-                                            <Button className="w-full">
+                                            <Button className="w-full relative z-10">
                                                 {progress === 100 ? (
                                                     <>
                                                         <Check className="w-4 h-4" /> Review
@@ -191,13 +270,20 @@ export default function Classes() {
                             Start your learning journey by creating your first class.
                             Ajibade will guide you every step of the way!
                         </p>
-                        <Link to="/teach-me/topic">
-                            <Button size="lg" className="shadow-lg shadow-primary/20">
-                                <Plus className="w-5 h-5" /> Create Your First Class
-                            </Button>
-                        </Link>
+                        <Button
+                            size="lg"
+                            className="shadow-lg shadow-primary/20"
+                            onClick={() => setShowCreateDialog(true)}
+                        >
+                            <Plus className="w-5 h-5" /> Create Your First Class
+                        </Button>
                     </motion.div>
                 )}
+
+                {/* Creation Dialog */}
+                <AnimatePresence>
+                    {showCreateDialog && <CreationDialog />}
+                </AnimatePresence>
             </div>
         </AppLayout>
     );

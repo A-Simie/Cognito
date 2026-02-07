@@ -48,7 +48,10 @@ export function SessionSetup() {
 
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                navigate(`/teach-me/session/${sessionId}`, { replace: true });
+                navigate(`/teach-me/session/${sessionId}`, {
+                    replace: true,
+                    state: { unit: state.unit }
+                });
 
             } catch (error) {
                 navigate('/teach-me/class/units');

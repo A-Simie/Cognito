@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { useLessonWebSocket } from '@/hooks/useLessonWebSocket';
@@ -8,10 +8,15 @@ import { ConfirmDialog } from '@/components/dialog/ConfirmDialog';
 export function LessonSession() {
     const { sessionId } = useParams<{ sessionId: string }>();
     const navigate = useNavigate();
+    const { state } = useLocation(); // Get unit state
+    const unit = state?.unit;
+    const isYouTubeMode = !!unit?.youtubeUrl;
+
     const iframeRef = useRef<HTMLIFrameElement>(null);
+    const playerRef = useRef<any>(null); // YouTube Player ref
     const [showExitDialog, setShowExitDialog] = useState(false);
 
-
+    // ... existing states ...
     const [isQuizActive, setIsQuizActive] = useState(false);
     const [isQuizFinished, setIsQuizFinished] = useState(false);
     const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
@@ -20,6 +25,7 @@ export function LessonSession() {
     const [quizScore, setQuizScore] = useState(0);
     const [manualChatEnabled, setManualChatEnabled] = useState(false);
     const [hasStarted, setHasStarted] = useState(false);
+    const [isAudioFinished, setIsAudioFinished] = useState(false);
 
     const {
         steps,
@@ -29,14 +35,16 @@ export function LessonSession() {
         isLoadingClarification,
         sendStepCompleted,
         completedAudioSteps,
-    } = useLessonWebSocket(hasStarted ? (sessionId || null) : null);
+        requestTTS, // Add requestTTS
+    } = useLessonWebSocket(hasStarted ? (sessionId || null) : null, isYouTubeMode);
 
     const currentStep = steps[steps.length - 1];
 
     // Auto-advance is now handled by onPlaybackEnded callback from AjibadePanel
     const handleAudioEnded = () => {
-        // Only auto-advance if it's NOT a quiz and NOT waiting for clarification
-        if (!isQuizActive && !manualChatEnabled && !clarificationResponse) {
+        setIsAudioFinished(true);
+        // Only auto-advance if it's NOT a quiz and chat is NOT enabled.
+        if (!isQuizActive && !manualChatEnabled) {
             console.log("Audio ended - Auto-advancing step...");
             sendStepCompleted();
         }
@@ -44,6 +52,7 @@ export function LessonSession() {
 
     useEffect(() => {
         // Detect if current step is a quiz and reset states
+        setIsAudioFinished(false);
         if (currentStep?.stepPayload?.quizzesJson && currentStep.stepPayload.quizzesJson.length > 0) {
             setIsQuizActive(true);
             setIsQuizFinished(false);
@@ -59,13 +68,105 @@ export function LessonSession() {
     }, [currentStep]);
 
     useEffect(() => {
-        if (currentStep?.stepPayload?.canvasHtmlContent && iframeRef.current) {
+        const targetStep = clarificationResponse || currentStep;
+
+        if (targetStep?.stepPayload?.canvasHtmlContent && iframeRef.current) {
             const iframe = iframeRef.current;
             const doc = iframe.contentDocument || iframe.contentWindow?.document;
             if (doc) {
                 doc.open();
-                doc.write(currentStep.stepPayload.canvasHtmlContent);
+                doc.write(targetStep.stepPayload.canvasHtmlContent);
                 doc.close();
+            }
+        }
+    }, [currentStep, clarificationResponse]);
+
+    // YouTube Logic
+    const extractVideoId = (url: string) => {
+        const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    };
+
+    const videoId = unit?.youtubeUrl ? extractVideoId(unit.youtubeUrl) : null;
+
+    useEffect(() => {
+        if (!isYouTubeMode || !videoId) return;
+
+        // Load API
+        if (!(window as any).YT) {
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            if (firstScriptTag && firstScriptTag.parentNode) {
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            } else {
+                document.head.appendChild(tag);
+            }
+        }
+
+        (window as any).onYouTubeIframeAPIReady = () => {
+            playerRef.current = new (window as any).YT.Player('youtube-player', {
+                height: '100%',
+                width: '100%',
+                videoId: videoId,
+                playerVars: {
+                    'playsinline': 1,
+                    'controls': 0, // Show controls? Maybe 0 for better immersion
+                    'rel': 0,
+                },
+                events: {
+                    'onReady': (event: any) => {
+                        // Ready
+                    }
+                }
+            });
+        };
+
+        // Handle case where API is already loaded
+        if ((window as any).YT && (window as any).YT.Player) {
+            (window as any).onYouTubeIframeAPIReady();
+        }
+
+    }, [isYouTubeMode, videoId]);
+
+    // Monitoring loop
+    useEffect(() => {
+        if (!playerRef.current || !currentStep?.stepPayload?.pauseAtSeconds) return;
+
+        const interval = setInterval(() => {
+            if (playerRef.current && playerRef.current.getCurrentTime) {
+                const currentTime = playerRef.current.getCurrentTime();
+                const pauseTime = currentStep.stepPayload.pauseAtSeconds;
+
+                // If within 0.5 second of pause time (and we are playing)
+                // Just checking >= might be safer if interval is slow
+                if (pauseTime && currentTime >= pauseTime && currentTime < pauseTime + 2) {
+                    const state = playerRef.current.getPlayerState();
+                    if (state === 1) { // Playing
+                        console.log("Reached pause point. Pausing...");
+                        playerRef.current.pauseVideo();
+                        // Request TTS
+                        if (currentStep.stepPayload.textToSpeak) {
+                            requestTTS(currentStep.stepPayload.textToSpeak);
+                        }
+                    }
+                }
+            }
+        }, 500);
+
+        return () => clearInterval(interval);
+    }, [currentStep, requestTTS]);
+
+    // Resume video when step changes (except first load? No, step change implies next segment)
+    useEffect(() => {
+        if (playerRef.current && typeof playerRef.current.playVideo === 'function') {
+            // If we are currently paused, RESUME.
+            // We check state to avoid interrupting loading or something
+            const state = playerRef.current.getPlayerState();
+            if (state === 2 || state === 5) { // Paused or Cued
+                console.log("New step arrived. Resuming video...");
+                playerRef.current.playVideo();
             }
         }
     }, [currentStep]);
@@ -127,7 +228,7 @@ export function LessonSession() {
         return null;
     }
 
-    const isChatDisabled = isQuizActive && !manualChatEnabled;
+    const isChatDisabled = !manualChatEnabled;
 
     return (
         <div className="fixed inset-0 flex flex-col bg-background-light dark:bg-slate-950 overflow-hidden">
@@ -166,6 +267,17 @@ export function LessonSession() {
                 </div>
             )}
 
+            {/* Clarification Loading Overlay */}
+            {isLoadingClarification && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
+                    <div className="text-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-xl animate-in fade-in zoom-in duration-300">
+                        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Ajibade is thinking...</h2>
+                        <p className="text-slate-500 dark:text-slate-400 mt-2">Generating your answer</p>
+                    </div>
+                </div>
+            )}
+
             {/* Header - Minimal and absolute positioned or top bar */}
             <div className="flex items-center justify-between p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 z-10 shrink-0">
                 <button onClick={handleBackClick} className="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">
@@ -184,16 +296,25 @@ export function LessonSession() {
             <div className="flex-1 flex flex-col lg:flex-row relative overflow-hidden">
                 {/* Sandbox / Whiteboard Area - Full width on mobile, Left side on desktop */}
                 <div className="w-full lg:w-2/3 xl:w-3/4 h-[55vh] lg:h-full bg-slate-100 dark:bg-slate-900 relative order-1 lg:order-1 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 transition-all duration-500 ease-in-out">
-                    <iframe
-                        key={currentStep?.id}
-                        ref={iframeRef}
-                        title="Interactive Sandbox"
-                        sandbox="allow-scripts allow-same-origin"
-                        className="w-full h-full border-0"
-                    />
+                    {isYouTubeMode && (
+                        <div
+                            id="youtube-player"
+                            className={`w-full h-full ${clarificationResponse?.stepPayload?.canvasHtmlContent ? 'hidden' : 'block'}`}
+                        />
+                    )}
+
+                    {(!isYouTubeMode || clarificationResponse?.stepPayload?.canvasHtmlContent) && (
+                        <iframe
+                            key={(clarificationResponse || currentStep)?.id}
+                            ref={iframeRef}
+                            title="Interactive Sandbox"
+                            sandbox="allow-scripts allow-same-origin"
+                            className="w-full h-full border-0"
+                        />
+                    )}
 
                     {/* Real Quiz UI Overlay - Now a Modal */}
-                    {isQuizActive && !manualChatEnabled && currentStep?.stepPayload?.quizzesJson && (
+                    {isQuizActive && isAudioFinished && !manualChatEnabled && currentStep?.stepPayload?.quizzesJson && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
                             <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-lg w-full p-8 border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300">
 
@@ -306,7 +427,8 @@ export function LessonSession() {
                         </div>
                     )}
 
-                    {manualChatEnabled && (
+                    {/* Continue Button Removed as requested */}
+                    {/* {manualChatEnabled && (
                         <div className="absolute bottom-6 right-6 z-30">
                             <button
                                 onClick={handleContinueAfterQuestion}
@@ -315,7 +437,7 @@ export function LessonSession() {
                                 Continue to Next Step
                             </button>
                         </div>
-                    )}
+                    )} */}
 
 
                     {/* Optional: Add a subtle loading indicator if needed, but not the full blocking screen */}
@@ -329,7 +451,10 @@ export function LessonSession() {
                 {/* Ajibade Panel - Bottom Sheet on Mobile, Right Sidebar on Desktop */}
                 <AjibadePanel
                     className="w-full lg:w-1/3 xl:w-1/4 h-[45vh] lg:h-auto order-2 lg:order-2 z-20 shadow-[-4px_0_24px_rgba(0,0,0,0.1)] transition-all duration-500 ease-in-out"
-                    onSendMessage={(msg) => sendMessage('USER_QUESTION', { questionText: msg })}
+                    onSendMessage={(msg, audioData) => {
+                        sendMessage('USER_QUESTION', { questionText: msg, audioData });
+                        setManualChatEnabled(false); // Disable chat immediately
+                    }}
                     clarificationResponse={clarificationResponse}
                     isLoadingClarification={isLoadingClarification}
                     disabled={isChatDisabled}

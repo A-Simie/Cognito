@@ -11,8 +11,10 @@ const Settings = lazy(() => import('@/pages/dashboard/Settings'));
 const QuizMode = lazy(() => import('@/pages/dashboard/QuizMode'));
 const TeachMe = lazy(() => import('@/pages/dashboard/TeachMe'));
 const Community = lazy(() => import('@/pages/dashboard/Community'));
+const LessonUnitsList = lazy(() => import('@/pages/teach-me/LessonUnitsList'));
 const Privacy = lazy(() => import('@/pages/home/Privacy'));
 const Terms = lazy(() => import('@/pages/home/Terms'));
+const YouTubeSelection = lazy(() => import('@/pages/teach-me/YouTubeSelection'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 
@@ -68,6 +70,16 @@ export const publicRoutes: AppRoute[] = [
         path: '/privacy',
         element: <Privacy />,
         title: 'Privacy Policy',
+    },
+    {
+        path: '/teach-me/class/units',
+        element: <LessonUnitsList />,
+        title: 'Class Curriculum',
+    },
+    {
+        path: '/teach-me/youtube-setup',
+        element: <YouTubeSelection />,
+        title: 'New YouTube Class',
     },
     {
         path: '/terms',

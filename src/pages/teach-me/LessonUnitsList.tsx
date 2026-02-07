@@ -171,3 +171,5 @@ export function LessonUnitsList() {
         </div>
     );
 }
+
+export default LessonUnitsList;

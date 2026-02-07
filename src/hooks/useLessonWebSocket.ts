@@ -4,20 +4,20 @@ const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'wss://ubiquitous-waffle-6qvp
 
 export interface LessonStep {
     id: string;
-    stepType: 'NORMAL' | 'CLARIFICATION' | 'CONCLUSION';
+    stepType: 'NORMAL' | 'CLARIFICATION' | 'CONCLUSION' | 'YOUTUBE';
     stepPayload: {
         textToSpeak: string;
         canvasHtmlContent?: string;
         quizzesJson?: any[];
+        pauseAtSeconds?: number;
     };
 }
 
-export function useLessonWebSocket(sessionId: string | null) {
+export function useLessonWebSocket(sessionId: string | null, isYouTubeMode: boolean = false) {
     const socketRef = useRef<WebSocket | null>(null);
     const [steps, setSteps] = useState<LessonStep[]>([]);
 
     // Track the LAST step ID that arrived, so we can associate AUDIO_END with it reliably.
-    // This avoids "stale closure" issues where we look at `steps` state in a callback.
     const lastStepIdRef = useRef<string | null>(null);
 
     const [isConnected, setIsConnected] = useState(false);
@@ -26,13 +26,8 @@ export function useLessonWebSocket(sessionId: string | null) {
     const [clarificationResponse, setClarificationResponse] = useState<LessonStep | null>(null);
     const [isLoadingClarification, setIsLoadingClarification] = useState(false);
 
-
     // Ref to hold the latest sendStepCompleted function
-    // This allows us to call it inside handleMessage without creating a circular dependency
-    // or stale checks, satisfying the "sendStepCompleted must be in scope" requirement.
     const sendStepCompletedRef = useRef<() => void>(() => { });
-
-
 
     useEffect(() => {
         if (!sessionId) return;
@@ -44,11 +39,15 @@ export function useLessonWebSocket(sessionId: string | null) {
             return;
         }
 
-        // Fix: Encode token to handle special characters help
-        // URL Pattern: ws://[host]/ws/lesson/{sessionId}?token={JWT_TOKEN}
         const wsUrl = `${WS_BASE_URL}/lesson/${sessionId}?token=${encodeURIComponent(token)}`;
         const ws = new WebSocket(wsUrl);
         socketRef.current = ws;
+
+        const pingInterval = setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'PING' }));
+            }
+        }, 10000);
 
         ws.onopen = () => {
             console.log("WS Connected");
@@ -64,9 +63,10 @@ export function useLessonWebSocket(sessionId: string | null) {
             }
         };
 
-        ws.onclose = () => {
-            console.log("WS Disconnected");
+        ws.onclose = (event) => {
+            console.log("WS Disconnected", event.code, event.reason);
             setIsConnected(false);
+            clearInterval(pingInterval);
         };
 
         ws.onerror = (error) => {
@@ -74,36 +74,69 @@ export function useLessonWebSocket(sessionId: string | null) {
         };
 
         return () => {
+            clearInterval(pingInterval);
             ws.close();
         };
     }, [sessionId]);
 
     const handleMessage = (message: any) => {
+        console.log("📩 WS Received:", message.type, message);
         switch (message.type) {
             case 'INITIALIZING':
                 console.log("Lesson Initializing:", message.message);
                 break;
             case 'NEXT_STEP':
                 if (message.step) {
-                    // Fix: Use ID from message if available, else generate UUID. 
-                    // Do NOT overwrite with Date.now() to ensure backend sync.
                     const stepWithId = { ...message.step, id: message.step.id || crypto.randomUUID() };
-
-                    // Track this ID as the active one for audio association
                     lastStepIdRef.current = stepWithId.id;
-
                     setSteps(prev => [...prev, stepWithId]);
+                    setClarificationResponse(null);
                 }
+                break;
+            case 'YOUTUBE_STEP':
+                const ytStep: LessonStep = {
+                    id: crypto.randomUUID(),
+                    stepType: 'YOUTUBE',
+                    stepPayload: {
+                        textToSpeak: message.textToSpeak,
+                        quizzesJson: message.quizzesJson,
+                        pauseAtSeconds: message.pauseAtSeconds,
+                    }
+                };
+                lastStepIdRef.current = ytStep.id;
+                setSteps(prev => [...prev, ytStep]);
+                setClarificationResponse(null);
+                setIsLoadingClarification(false);
+                break;
+            case 'YOUTUBE_STEP_LOADING':
+                console.log("YouTube step loading...");
+                setIsLoadingClarification(true);
                 break;
             case 'CLARIFICATION_RESPONSE':
                 if (message.step) {
-                    const stepWithId = { ...message.step, id: message.step.id || crypto.randomUUID() };
-                    setClarificationResponse(stepWithId);
+                    let step = message.step;
+                    // Detect if flat YouTubeStep
+                    if (!step.stepType && (step.textToSpeak || step.pauseAtSeconds)) {
+                        step = {
+                            id: step.id || crypto.randomUUID(),
+                            stepType: 'CLARIFICATION',
+                            stepPayload: {
+                                textToSpeak: step.textToSpeak,
+                                quizzesJson: step.quizzesJson,
+                                pauseAtSeconds: step.pauseAtSeconds
+                            }
+                        };
+                    } else if (!step.id) {
+                        step.id = crypto.randomUUID();
+                    }
+                    setClarificationResponse(step);
                     setIsLoadingClarification(false);
                 }
                 break;
             case 'LOAD_INSTRUCTION':
                 setIsLoadingClarification(true);
+                break;
+            case 'PONG':
                 break;
             case 'AUDIO_CHUNK':
                 if (message.audioData) {
@@ -115,38 +148,50 @@ export function useLessonWebSocket(sessionId: string | null) {
                 const stepId = lastStepIdRef.current;
                 if (stepId) {
                     setCompletedAudioSteps(prev => new Set(prev).add(stepId));
-                    // Fix: We do NOT trigger next step request when audio ends blindly.
-                    // The UI (AjibadePanel) listens for audio end and calls sendStepCompleted if appropriate (non-quiz).
-                    // sendStepCompletedRef.current();
+                    window.dispatchEvent(new CustomEvent('lesson-audio-end', { detail: { stepId } }));
                 }
-
-                // Fix: Explicitly DO NOT advance mock step index here.
-                // We wait for the client to call sendStepCompleted() after it finishes playing audio
-                // or after the user completes the quiz.
-                // if (sessionId === 'dev-session') {
-                //      setMockStepIndex(prev => prev + 1);
-                // }
                 break;
-            case 'StepCompleted':
-                // Ack if needed
+            case 'YOUTUBE_LESSON_COMPLETED':
+            case 'SESSION_COMPLETED':
+                console.log("Lesson Completed:", message);
                 break;
             default:
                 console.log("Unhandled WS message", message.type);
         }
     };
 
-    const sendStepCompleted = useCallback(() => {
-        socketRef.current?.send(JSON.stringify({ type: 'STEP_COMPLETED', data: {} }));
-    }, [sessionId]);
+    const sendMessage = useCallback((type: string, data: any) => {
+        socketRef.current?.send(JSON.stringify({ type, data }));
+    }, []);
 
-    // Keep the ref updated with the latest function
+    const sendStepCompleted = useCallback(() => {
+        console.log(`Sending step completed. Mode: ${isYouTubeMode ? 'YOUTUBE' : 'NORMAL'}`);
+        if (socketRef.current?.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({
+                type: isYouTubeMode ? 'YOUTUBE_STEP_COMPLETED' : 'STEP_COMPLETED',
+                ...(isYouTubeMode ? {} : { data: { sessionId } }) // STEP_COMPLETED usually wants data object?
+                // Wait, GUIDE says STEP_COMPLETED has { sessionId } inside? No, it's inside body usually.
+                // Normal mode: { type: 'STEP_COMPLETED', data: { sessionId: ... } } (if using sendMessage style)
+                // But here we construct manually. Let's match existing sendMessage style.
+                // sendMessage wraps in { type, data }. 
+                // So here:
+                // Normal: { type: 'STEP_COMPLETED', data: { sessionId } }
+                // YouTube: { type: 'YOUTUBE_STEP_COMPLETED' } (no data)
+            }));
+        }
+    }, [sessionId, isYouTubeMode]);
+
+    // Update the ref
     useEffect(() => {
         sendStepCompletedRef.current = sendStepCompleted;
     }, [sendStepCompleted]);
 
-    const sendMessage = useCallback((type: string, data: any) => {
-        socketRef.current?.send(JSON.stringify({ type, data }));
-    }, [sessionId]);
+    const requestTTS = useCallback((textToSpeak: string) => {
+        console.log("Requesting TTS for YouTube step");
+        // GUIDE says type: REQUEST_TTS, data: { textToSpeak }
+        // sendMessage wraps in data property, so this works.
+        sendMessage('REQUEST_TTS', { textToSpeak });
+    }, [sendMessage]);
 
     return {
         steps,
@@ -156,5 +201,6 @@ export function useLessonWebSocket(sessionId: string | null) {
         isLoadingClarification,
         sendStepCompleted,
         completedAudioSteps,
+        requestTTS,
     };
 }

@@ -26,13 +26,13 @@ const LEARNING_MODES = [
         title: 'YouTube Tutor',
         description: 'Turn any video into an interactive lesson with real-time quizzes and notes.',
         icon: Play,
-        href: null,
-        buttonText: 'Coming Soon',
+        href: '/classes',
+        buttonText: 'Start Learning',
         gradient: 'from-red-500/10 to-pink-500/10',
         hoverBorder: 'hover:border-red-200',
         iconBg: 'from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20',
         iconColor: 'text-red-500',
-        comingSoon: true,
+        comingSoon: false,
     },
     {
         id: 'pdf',
@@ -207,7 +207,7 @@ export default function Dashboard() {
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1 leading-relaxed">
                                     {mode.description}
                                 </p>
-                                <Button 
+                                <Button
                                     className="w-full"
                                     onClick={() => {
                                         if (mode.comingSoon) {

@@ -12,11 +12,12 @@ interface Message {
     role: "user" | "assistant";
     content: string;
     timestamp: string;
+    audioUrl?: string;
 }
 
 interface AjibadePanelProps {
     className?: string;
-    onSendMessage: (message: string) => void;
+    onSendMessage: (message: string, audioData?: string) => void;
     clarificationResponse?: {
         id?: string;
         stepPayload: { textToSpeak: string };
@@ -230,12 +231,7 @@ export function AjibadePanel({
 
     // Reset audio when stepping (changing text)
     useEffect(() => {
-        // If text changes, it implies a new step, so we might want to ensure we aren't playing old audio.
-        // However, for streaming, we might receive text *before* audio finishes.
-        // But typically a "new step" means "stop previous step's audio".
-        // Let's safe-guard: if currentStepText changes significantly or looking for a "reset" signal.
-        // For now, relies mostly on the stream flow. 
-        // Optionally reset timeline if needed, but streaming usually implies continuous flow.
+        // Option to clear/reset state if text changes abruptly
     }, [currentStepText]);
 
     useEffect(() => {
@@ -278,37 +274,111 @@ export function AjibadePanel({
                 }),
             };
             setMessages((prev) => [...prev, aiMessage]);
+
+            // Audio Pipeline Reset for new answer
+            // 1. Reset timeline to current time to avoid scheduling lag/future bug
+            if (audioContextRef.current) {
+                // Determine 'safe' start time: now + slight buffer
+                nextStartTimeRef.current = audioContextRef.current.currentTime + 0.1;
+
+                // 2. Force resume to ensure browser didn't suspend it
+                if (audioContextRef.current.state === 'suspended') {
+                    audioContextRef.current.resume().catch(e => console.error("Auto-resume failed:", e));
+                }
+            } else {
+                // If not initialized yet (unlikely), reset ref
+                nextStartTimeRef.current = 0;
+            }
         }
     }, [clarificationResponse]);
 
-    const handleSubmit = (e: FormEvent) => {
+    // Recording Refs
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+
+    const handleSubmit = (e: FormEvent, audioData?: string) => {
         e.preventDefault();
-        if (!input.trim()) return;
+        // Allow empty input if audio is present
+        if (!input.trim() && !audioData) return;
+
+        let audioUrl: string | undefined;
+        if (audioData && audioChunksRef.current.length > 0) {
+            // Create a blob URL from the chunks for playback
+            const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+            audioUrl = URL.createObjectURL(blob);
+        }
 
         const userMessage: Message = {
             id: Date.now().toString(),
             role: "user",
-            content: input.trim(),
+            content: input.trim() || (audioData ? "🎤 Voice Message" : ""),
             timestamp: new Date().toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
             }),
+            audioUrl: audioUrl
         };
 
         setMessages((prev) => [...prev, userMessage]);
-        onSendMessage(input.trim());
+        onSendMessage(input.trim(), audioData);
         setInput("");
+
+        // Don't clear chunks here immediately if re-using, but we are done.
+        // audioChunksRef.current = []; // Wait, startRecording clears this. It's safe.
+    };
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Use low bitrate Opus for compact message size (prevent 1009 Too Big)
+            const options = { mimeType: 'audio/webm;codecs=opus', bitsPerSecond: 16000 };
+            const mediaRecorder = new MediaRecorder(stream, options);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                // Create blob from chunks
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+
+                const reader = new FileReader();
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = () => {
+                    const base64String = reader.result as string;
+                    // Strip the data:audio/webm;base64, prefix
+                    const base64Data = base64String.split(',')[1];
+                    handleSubmit({ preventDefault: () => { } } as FormEvent, base64Data);
+                };
+
+                // Stop all tracks to release microphone
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+        } catch (err) {
+            console.error("Error accessing microphone:", err);
+            alert("Could not access microphone. Please ensure permissions are granted.");
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+        }
     };
 
     const toggleRecording = () => {
-        setIsRecording(!isRecording);
-        if (!isRecording) {
-            setTimeout(() => {
-                setIsRecording(false);
-                setInput(
-                    (prev) => prev + (prev ? " " : "") + "Voice message transcribed...",
-                );
-            }, 2000);
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
         }
     };
 
@@ -361,13 +431,24 @@ export function AjibadePanel({
                         </span>
                     </div>
                     {messages.map((message) => (
-                        <MessageBubble
-                            key={message.id}
-                            role={message.role}
-                            content={message.content}
-                            timestamp={message.timestamp}
-                            avatar={message.role === "assistant" ? AJIBADE_AVATAR : undefined}
-                        />
+                        <div key={message.id} className="flex flex-col gap-1 w-full">
+                            <MessageBubble
+                                role={message.role}
+                                content={message.content}
+                                timestamp={message.timestamp}
+                                avatar={message.role === "assistant" ? AJIBADE_AVATAR : undefined}
+                            />
+                            {/* Render Audio Player if audioUrl exists */}
+                            {message.audioUrl && (
+                                <div className={cn("flex w-full mt-1", message.role === 'user' ? "justify-end pr-12" : "justify-start pl-12")}>
+                                    <audio
+                                        controls
+                                        src={message.audioUrl}
+                                        className="h-8 w-48 rounded-full shadow-sm bg-slate-100 dark:bg-slate-700"
+                                    />
+                                </div>
+                            )}
+                        </div>
                     ))}
                     {isLoadingClarification && (
                         <div className="flex items-center gap-2 text-slate-400 pl-2">
@@ -379,7 +460,7 @@ export function AjibadePanel({
                 </div>
 
                 <div className="p-3 bg-slate-900/90 backdrop-blur-xl border-t border-white/5 shrink-0">
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={(e) => handleSubmit(e)}>
                         <div className="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-xl border border-white/10 focus-within:border-primary/40 transition-all">
                             <input
                                 value={input}
