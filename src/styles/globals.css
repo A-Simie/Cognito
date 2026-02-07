@@ -2,9 +2,9 @@
 
 @theme {
   /* Colors */
-  --color-primary: #4F46E5;
-  --color-primary-dark: #3730A3;
-  --color-primary-light: #A5B4FC;
+  --color-primary: #2563eb;
+  --color-primary-dark: #1e40af;
+  --color-primary-light: #60a5fa;
 
   --color-background-light: #F8FAFC;
   --color-background-dark: #0F172A;
@@ -15,7 +15,7 @@
   --color-card-night: #0F172A;
 
   --color-surface-light: #f9fafb;
-  --color-surface-dark: #1e1b4b;
+  --color-surface-dark: #0f172a;
 
   --color-success: #10B981;
   --color-error: #EF4444;
@@ -32,7 +32,7 @@
 
   /* Shadows */
   --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-  --shadow-glow: 0 0 15px rgba(79, 70, 229, 0.3);
+  --shadow-glow: 0 0 15px rgba(37, 99, 235, 0.3);
   --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
   /* Animations */
@@ -68,11 +68,11 @@
 
     0%,
     100% {
-      box-shadow: 0 0 20px rgba(79, 70, 229, 0.4);
+      box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
     }
 
     50% {
-      box-shadow: 0 0 40px rgba(79, 70, 229, 0.8);
+      box-shadow: 0 0 40px rgba(37, 99, 235, 0.8);
     }
   }
 
@@ -138,7 +138,7 @@ body {
 }
 
 .chat-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(79, 70, 229, 0.2);
+  background-color: rgba(37, 99, 235, 0.2);
   border-radius: 20px;
 }
 
@@ -151,12 +151,12 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(79, 70, 229, 0.1);
+  background-color: rgba(37, 99, 235, 0.1);
   border-radius: 20px;
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(79, 70, 229, 0.3);
+  background-color: rgba(37, 99, 235, 0.3);
 }
 
 /* Utility classes */
