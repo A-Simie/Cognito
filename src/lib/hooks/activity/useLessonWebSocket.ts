@@ -93,13 +93,21 @@ export function useLessonWebSocket(sessionId: string | null, isYouTubeMode: bool
                     setClarificationResponse(null);
                 }
                 break;
-            case 'YOUTUBE_STEP':
+            case 'YOUTUBE_STEP': {
+                let quizzes = message.quizzesJson;
+                if (quizzes && typeof quizzes === 'string') {
+                    try {
+                        quizzes = JSON.parse(quizzes);
+                    } catch (e) {
+                        console.error("Failed to parse quizzesJson", e);
+                    }
+                }
                 const ytStep: LessonStep = {
                     id: crypto.randomUUID(),
                     stepType: 'YOUTUBE',
                     stepPayload: {
                         textToSpeak: message.textToSpeak,
-                        quizzesJson: message.quizzesJson,
+                        quizzesJson: quizzes,
                         pauseAtSeconds: message.pauseAtSeconds,
                     }
                 };
@@ -108,6 +116,7 @@ export function useLessonWebSocket(sessionId: string | null, isYouTubeMode: bool
                 setClarificationResponse(null);
                 setIsLoadingClarification(false);
                 break;
+            }
             case 'YOUTUBE_STEP_LOADING':
                 console.log("YouTube step loading...");
                 setIsLoadingClarification(true);
@@ -117,12 +126,18 @@ export function useLessonWebSocket(sessionId: string | null, isYouTubeMode: bool
                     let step = message.step;
                     // Detect if flat YouTubeStep
                     if (!step.stepType && (step.textToSpeak || step.pauseAtSeconds)) {
+                        let quizzes = step.quizzesJson;
+                        if (quizzes && typeof quizzes === 'string') {
+                            try {
+                                quizzes = JSON.parse(quizzes);
+                            } catch (e) { console.error("Failed to parse quizzesJson", e); }
+                        }
                         step = {
                             id: step.id || crypto.randomUUID(),
                             stepType: 'CLARIFICATION',
                             stepPayload: {
                                 textToSpeak: step.textToSpeak,
-                                quizzesJson: step.quizzesJson,
+                                quizzesJson: quizzes,
                                 pauseAtSeconds: step.pauseAtSeconds
                             }
                         };
@@ -161,6 +176,7 @@ export function useLessonWebSocket(sessionId: string | null, isYouTubeMode: bool
     };
 
     const sendMessage = useCallback((type: string, data: any) => {
+        console.log(`📤 WS Sending: ${type}`, data);
         socketRef.current?.send(JSON.stringify({ type, data }));
     }, []);
 
