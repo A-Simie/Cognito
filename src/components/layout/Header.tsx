@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { GraduationCap, Menu, X } from "lucide-react";
+import { GraduationCap, Menu, X, LogOut } from "lucide-react";
 
 import { Avatar } from "@/components/ui/Avatar";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { cn } from "@/lib/utils/utils";
 import { useAuthStore } from "@/lib/store/authStore";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -17,6 +18,7 @@ export function Header() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuthStore();
+  const { logout } = useAuth();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -72,12 +74,21 @@ export function Header() {
           <div className="flex items-center gap-4 md:gap-6">
             <ThemeToggle />
 
-            <Avatar
-              src={user?.profilePicture}
-              alt={user?.fullName || "User"}
-              size="sm"
-              className="cursor-pointer hidden sm:block"
-            />
+            <div className="hidden sm:flex items-center gap-4 pl-4 border-l border-gray-200 dark:border-gray-800">
+              <Avatar
+                src={user?.profilePicture}
+                alt={user?.fullName || "User"}
+                size="sm"
+                className="cursor-pointer"
+              />
+              <button
+                onClick={logout}
+                className="p-2 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-all cursor-pointer"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -93,11 +104,11 @@ export function Header() {
       {/* Mobile menu panel */}
       <div
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-72 bg-white dark:bg-background-dark border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out md:hidden",
+          "fixed top-0 left-0 z-50 h-full w-72 bg-white dark:bg-background-dark border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out md:hidden flex flex-col",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="p-6">
+        <div className="p-6 flex-1 flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 text-primary bg-primary/10 rounded-lg flex items-center justify-center">
@@ -137,23 +148,29 @@ export function Header() {
             })}
           </nav>
 
-          {/* Mobile user info */}
-          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
+          <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-800 space-y-6">
             <div className="flex items-center gap-3">
               <Avatar
                 src={user?.profilePicture}
                 alt={user?.fullName || "User"}
                 size="sm"
               />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                   {user?.fullName || "Loading..."}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {user?.email}
                 </p>
               </div>
             </div>
+            <button
+              onClick={logout}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 font-bold hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import { AjibadePanel } from "@/components/features/ajibade";
 import { BottomSheet } from "@/components/layout/BottomSheet";
-import { useIsMobile } from "@/lib/hooks/app/useMediaQuery";
+import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 
 export default function PDFTutor() {
   const [isAjibadeOpen, setIsAjibadeOpen] = useState(false);

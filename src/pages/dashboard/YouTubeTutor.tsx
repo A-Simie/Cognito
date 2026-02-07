@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Progress } from "@/components/ui/Progress";
 import { AjibadePanel } from "@/components/features/ajibade";
 import { BottomSheet } from "@/components/layout/BottomSheet";
-import { useIsMobile } from "@/lib/hooks/app/useMediaQuery";
+import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 
 const VIDEO_THUMBNAIL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuC7w9Xy9C9ekWE905vm3T_PQ7uCsAbTED9DlTJrdSAfpe083geJTcpDLrQEkc_q8v_W-SuY46MjbljrkpW8XmW9kkvxMGx-motQEgfcE3axq8s5CXPue6uAQpskEVwM-8g_4skaiF2Ml3mmSw3kAYYefbYfTePIL4SIX-DBDq_2tqbkPJvV8nOdCAQBfp86OSlCLuOkVYyGf96_w-UsNjAsB_YztVlSSvuV16c8cdqCFQaA_cNuw7X3kboXOf_GRDn8FGmev0QlJ2k4";

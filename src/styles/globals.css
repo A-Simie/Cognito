@@ -119,7 +119,7 @@ body {
 }
 
 .dark body {
-  @apply bg-[#020617] text-white;
+  @apply bg-background-night text-white;
 }
 
 /* Scrollbar utilities */
@@ -174,3 +174,20 @@ body {
 .perspective-1000 {
   perspective: 1000px;
 }
+
+/* Hide number input spinners */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+ input[type="password"]::-ms-reveal,
+ input[type="password"]::-ms-clear {
+   display: none;
+ }

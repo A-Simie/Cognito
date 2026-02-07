@@ -1,9 +1,7 @@
-export { useTheme } from "./layout/useTheme";
+export { useTheme } from "./theme/useTheme";
 export {
   useMediaQuery,
   useIsMobile,
   useIsTablet,
   useIsDesktop,
-} from "./app/useMediaQuery";
-export { useLocalStorage } from "./layout/useLocalStorage";
-export { useDebounce } from "./layout/useDebounce";
+} from "./activity/useMediaQuery";

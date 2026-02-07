@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 import { useToastStore } from "@/lib/store/toastStore";
 import { validatePassword } from "@/lib/utils/validation";
 import { ArrowLeft, KeyRound, CheckCircle2 } from "lucide-react";

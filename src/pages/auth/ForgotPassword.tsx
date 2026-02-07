@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Mail, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useAuth } from "@/lib/hooks/auth/useAuth";
 import { useToastStore } from "@/lib/store/toastStore";
 import { validateEmail } from "@/lib/utils/validation";
 

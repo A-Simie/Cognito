@@ -1,7 +1,7 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft } from "lucide-react";
-import { useLessonWebSocket } from "@/lib/hooks/app/useLessonWebSocket";
+import { useLessonWebSocket } from "@/lib/hooks/activity/useLessonWebSocket";
 import { AjibadePanel } from "@/components/features/ajibade";
 import { ConfirmDialog } from "@/components/dialog/ConfirmDialog";
 
