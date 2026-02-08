@@ -5,6 +5,12 @@ import App from "./App";
 import { ToastContainer } from "@/components/ui/ToastContainer";
 import "./styles/globals.css";
 
+import { useAuthStore } from "@/lib/store/authStore";
+import { setupInterceptors } from "@/lib/services/apiClient";
+
+
+setupInterceptors(() => useAuthStore.getState().logout());
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

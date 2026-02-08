@@ -37,6 +37,8 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+import { AuthMiddleware } from "@/components/providers/AuthMiddleware";
+
 /**
  * Main App component
  */
@@ -45,28 +47,33 @@ export default function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            {/* Public routes */}
-            {publicRoutes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
+          <AuthMiddleware>
+            <Routes>
+              {/* Public routes */}
+              {publicRoutes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
 
-            {/* Protected routes */}
-            {protectedRoutes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={<PrivateRoute>{route.element}</PrivateRoute>}
-              />
-            ))}
+              {/* Protected routes */}
+              {protectedRoutes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={<PrivateRoute>{route.element}</PrivateRoute>}
+                />
+              ))}
 
-            {/* 404 Not Found */}
-            <Route path={notFoundRoute.path} element={notFoundRoute.element} />
-          </Routes>
+              {/* 404 Not Found */}
+              <Route
+                path={notFoundRoute.path}
+                element={notFoundRoute.element}
+              />
+            </Routes>
+          </AuthMiddleware>
         </Suspense>
       </BrowserRouter>
     </ThemeProvider>

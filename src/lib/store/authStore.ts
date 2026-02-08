@@ -44,6 +44,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user, isAuthenticated: true });
     } catch (error) {
       Cookies.remove("auth_token");
+      Cookies.remove("auth_token", { path: "/" });
       set({ user: null, isAuthenticated: false });
     } finally {
       set({ isLoading: false });
