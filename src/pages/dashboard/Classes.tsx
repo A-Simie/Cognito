@@ -86,26 +86,39 @@ const CreationDialog = ({ onClose, onNavigate }: CreationDialogProps) => (
           </div>
         </button>
 
-          <button
-            onClick={() => navigate("/teach-me/pdf-setup")}
-            className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all text-left"
-          >
-            <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-              <FileText className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">
-                From PDF
-              </h3>
-              <p className="text-sm text-slate-500">
-                Upload a document to get summaries and quizzes.
-              </p>
-            </div>
-          </button>
-        </div>
-      </motion.div>
-    </div>
-  );
+        <button
+          onClick={() => onNavigate("/teach-me/pdf-setup")}
+          className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all text-left"
+        >
+          <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+              From PDF
+            </h3>
+            <p className="text-sm text-slate-500">
+              Upload a document to get summaries and quizzes.
+            </p>
+          </div>
+        </button>
+      </div>
+    </motion.div>
+  </div>
+);
+
+export default function Classes() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { data: classes = [], isLoading: loading } = useClasses();
+  const [showBanner, setShowBanner] = useState(true);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+
+  const state = location.state as {
+    message?: string;
+    newClassId?: number;
+  } | null;
+  const newClassId = state?.newClassId;
 
   return (
     <AppLayout>
