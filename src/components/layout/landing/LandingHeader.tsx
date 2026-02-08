@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -16,6 +16,8 @@ export const LandingHeader = ({
   isMenuOpen,
   setIsMenuOpen,
 }: LandingHeaderProps) => {
+  const location = useLocation();
+
   return (
     <>
       <header
@@ -47,24 +49,24 @@ export const LandingHeader = ({
           </div>
 
           <nav className="hidden md:flex items-center gap-6 lg:gap-10 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">
-            <a
-              href="#ecosystem"
+            <Link
+              to={location.pathname === "/" ? "#ecosystem" : "/#ecosystem"}
               className="hover:text-blue-600 transition-colors"
             >
               Ecosystem
-            </a>
-            <a
-              href="#features"
+            </Link>
+            <Link
+              to={location.pathname === "/" ? "#features" : "/#features"}
               className="hover:text-blue-600 transition-colors"
             >
               Features
-            </a>
-            <a
-              href="#workflow"
+            </Link>
+            <Link
+              to={location.pathname === "/" ? "#workflow" : "/#workflow"}
               className="hover:text-blue-600 transition-colors"
             >
               Workflow
-            </a>
+            </Link>
           </nav>
 
           <div className="flex-1 flex items-center justify-end gap-1 md:gap-4">
@@ -100,9 +102,18 @@ export const LandingHeader = ({
           >
             <nav className="flex flex-col gap-10">
               {[
-                { t: "Ecosystem", h: "#ecosystem" },
-                { t: "Features", h: "#features" },
-                { t: "Workflow", h: "#workflow" },
+                {
+                  t: "Ecosystem",
+                  h: location.pathname === "/" ? "#ecosystem" : "/#ecosystem",
+                },
+                {
+                  t: "Features",
+                  h: location.pathname === "/" ? "#features" : "/#features",
+                },
+                {
+                  t: "Workflow",
+                  h: location.pathname === "/" ? "#workflow" : "/#workflow",
+                },
               ].map((item) => (
                 <a
                   key={item.t}

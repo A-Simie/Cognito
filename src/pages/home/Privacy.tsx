@@ -1,45 +1,95 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { AppLayout } from "@/components/layout/AppLayout";
+import { LandingHeader } from "@/components/layout/landing/LandingHeader";
+import { LandingFooter } from "@/components/layout/landing/LandingFooter";
+import { LandingBackground } from "@/components/layout/landing/LandingBackground";
 
 export default function Privacy() {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const now = new Date();
+  const currentMonth = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    timeZone: "UTC",
+  }).format(now);
+  const currentYear = now.getUTCFullYear();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <AppLayout hideHeader>
-      <div className="max-w-4xl mx-auto p-6 lg:p-10">
-        <button
-          type="button"
-          onClick={() => navigate("/signup", { replace: true })}
-          className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-primary transition-colors mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Sign Up
-        </button>
-        <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
-        <div className="prose dark:prose-invert">
-          <p>Last updated: January 2026</p>
-          <h2>1. Information We Collect</h2>
-          <p>
-            We collect information you provide directly to us, such as when you
-            create or modify your account, request on-demand services, contact
-            customer support, or otherwise communicate with us. This information
-            may include: name, email, phone number, postal address, profile
-            picture, payment method, items requested (for delivery services),
-            delivery notes, and other information you choose to provide.
-          </p>
+    <div className="min-h-screen bg-background-light dark:bg-[#02040c] text-slate-900 dark:text-white font-['Outfit'] selection:bg-blue-500/30 overflow-x-hidden relative">
+      <LandingBackground />
 
-          <h2>2. How We Use Your Information</h2>
-          <p>
-            We use the information we collect to facilitate and improve our
-            services. This includes:
-          </p>
-          <ul>
-            <li>Providing and maintaining our services</li>
-            <li>Improving and personalizing user experience</li>
-            <li>Understanding and analyzing usage trends</li>
-          </ul>
+      <LandingHeader
+        scrolled={scrolled}
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+      />
+
+      <main className="relative z-10 pt-32 pb-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <button
+            type="button"
+            onClick={() => navigate("/signup", { replace: true })}
+            className="inline-flex items-center cursor-pointer gap-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mb-8"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Sign Up
+          </button>
+
+          <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-white/10 p-8 md:p-12 shadow-xl">
+            <h1 className="text-4xl md:text-5xl font-black mb-8 tracking-tight">
+              Privacy Policy
+            </h1>
+
+            <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:font-black prose-h2:text-2xl prose-p:font-medium prose-p:text-slate-600 dark:prose-p:text-slate-400">
+              <p className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-8">
+                Last updated: {currentMonth} {currentYear}
+              </p>
+
+              <div className="space-y-3">
+                <div>
+                  <h2 className="font-medium text-lg">
+                    1. Information We Collect
+                  </h2>
+                  <p>
+                    We collect information required to personalize your learning
+                    journey. This includes account details, learning
+                    preferences, and content you provide to Ajibade (such as
+                    uploaded PDFs, YouTube links, and questions). We also track
+                    your progress to adapt future lessons and quizzes.
+                  </p>
+                </div>
+
+                <div>
+                  <h2 className="font-medium text-lg">
+                    2. How We Use Your Information
+                  </h2>
+                  <p>
+                    We use your data to power and improve our platform.
+                    Specifically, we use it to:
+                  </p>
+                  <ul className="list-disc pl-5 mt-2 space-y-1">
+                    <li>Generate personalized lessons and quizzes</li>
+                    <li>Adapt difficult concepts to your level</li>
+                    <li>Improve Ajibade's teaching capabilities</li>
+                    <li>Track your study streaks and progress</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </AppLayout>
+      </main>
+
+      <LandingFooter />
+    </div>
   );
 }
