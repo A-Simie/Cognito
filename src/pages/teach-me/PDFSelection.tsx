@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
     ArrowLeft,
     FileText,
@@ -15,6 +16,7 @@ import { useToastStore } from "@/lib/store/toastStore";
 
 export default function PDFSelection() {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const [file, setFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
@@ -62,6 +64,7 @@ export default function PDFSelection() {
         setIsLoading(true);
         try {
             await classService.createPdfClass(file);
+            await queryClient.invalidateQueries({ queryKey: ["classes"] });
             addToast("PDF Class Created Successfully!", "success");
             navigate("/classes", {
                 state: {

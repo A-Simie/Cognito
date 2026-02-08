@@ -25,6 +25,8 @@ export function useLessonWebSocket(sessionId: string | null, isYouTubeMode: bool
 
     const [clarificationResponse, setClarificationResponse] = useState<LessonStep | null>(null);
     const [isLoadingClarification, setIsLoadingClarification] = useState(false);
+    const [isCompleted, setIsCompleted] = useState(false);
+    const [completionStats, setCompletionStats] = useState<any>(null);
 
     // Ref to hold the latest sendStepCompleted function
     const sendStepCompletedRef = useRef<() => void>(() => { });
@@ -164,11 +166,20 @@ export function useLessonWebSocket(sessionId: string | null, isYouTubeMode: bool
                 if (stepId) {
                     setCompletedAudioSteps(prev => new Set(prev).add(stepId));
                     window.dispatchEvent(new CustomEvent('lesson-audio-end', { detail: { stepId } }));
+
+                    // Auto-advance if it's a normal teaching step (no quiz)
+                    // We need to check the current step's payload.
+                    // Since 'steps' state might be stale in this callback, we use the functional update pattern or a ref.
+                    // But accessing 'steps' here is tricky due to closure.
+                    // Better approach: Dispatch event or let the component handle logic?
+                    // Let's use a ref for the latest steps.
                 }
                 break;
             case 'YOUTUBE_LESSON_COMPLETED':
             case 'SESSION_COMPLETED':
                 console.log("Lesson Completed:", message);
+                setIsCompleted(true);
+                if (message.stats) setCompletionStats(message.stats);
                 break;
             default:
                 console.log("Unhandled WS message", message.type);
@@ -218,5 +229,7 @@ export function useLessonWebSocket(sessionId: string | null, isYouTubeMode: bool
         sendStepCompleted,
         completedAudioSteps,
         requestTTS,
+        isCompleted,
+        completionStats,
     };
 }

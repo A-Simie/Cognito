@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { classService } from "@/lib/services/classService";
 import { LoadingScreen } from "@/components/lesson/LoadingScreen";
 import { useToastStore } from "@/lib/store/toastStore";
@@ -7,6 +8,7 @@ import { useToastStore } from "@/lib/store/toastStore";
 export function LessonGeneration() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState("Analyzing topic...");
   const [progress, setProgress] = useState(5);
   const { addToast } = useToastStore();
@@ -26,7 +28,9 @@ export function LessonGeneration() {
         setProgress(5);
         setStatus(`Analyzing "${state.topic}"...`);
 
+
         const newClass = await classService.createTopicClass(state.topic);
+        await queryClient.invalidateQueries({ queryKey: ["classes"] });
         const classId = newClass.id;
 
         setStatus("Structuring core concepts...");

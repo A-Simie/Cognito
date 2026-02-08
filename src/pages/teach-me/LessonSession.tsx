@@ -39,12 +39,21 @@ export function LessonSession() {
     isLoadingClarification,
     sendStepCompleted,
     requestTTS,
+    isCompleted,
+    completionStats,
   } = useLessonWebSocket(hasStarted ? sessionId || null : null, isYouTubeMode);
 
   const currentStep = steps[steps.length - 1];
 
   const handleAudioEnded = () => {
     setIsAudioFinished(true);
+
+    // Safety: Do NOT auto-advance if this is a CONCLUSION step
+    if (currentStep?.stepType === 'CONCLUSION') {
+      console.log("CONCLUSION step audio ended. Waiting for SESSION_COMPLETED signal...");
+      return;
+    }
+
     if (!isQuizActive && !manualChatEnabled) {
       console.log("Audio ended - Auto-advancing step...");
       sendStepCompleted();
@@ -68,6 +77,17 @@ export function LessonSession() {
     }
     setTtsRequestedForStep(null);
   }, [currentStep]);
+
+  // Listen for audio end event from hook
+  // Listen for audio end event from hook
+  // REMOVED to align with Topic Mode behavior (wait for actual playback to finish)
+  /*
+  useEffect(() => {
+    const onLessonAudioEnd = () => handleAudioEnded();
+    window.addEventListener('lesson-audio-end', onLessonAudioEnd);
+    return () => window.removeEventListener('lesson-audio-end', onLessonAudioEnd);
+  }, [isQuizActive, manualChatEnabled, sendStepCompleted]);
+  */
 
   useEffect(() => {
     const targetStep = clarificationResponse || currentStep;
@@ -177,7 +197,12 @@ export function LessonSession() {
   const handleBackClick = () => setShowExitDialog(true);
   const handleConfirmExit = () => {
     setShowExitDialog(false);
-    navigate("/teach-me/class/units", { replace: true });
+    // Explicitly notify backend to close this session
+    sendMessage("CLOSE_SESSION", { sessionId });
+    // Small delay to ensure message is sent before navigation/hook cleanup
+    setTimeout(() => {
+      navigate("/teach-me/class/units", { replace: true });
+    }, 100);
   };
 
   const handleQuizOptionClick = (option: string, index: number) => {
@@ -204,11 +229,54 @@ export function LessonSession() {
     else sendStepCompleted();
   };
 
+  const SessionCompleteModal = () => {
+    if (!isCompleted || !isAudioFinished) return null;
+
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4 animate-in fade-in duration-500">
+        <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl max-w-lg w-full p-10 border border-slate-200 dark:border-slate-800 text-center animate-in zoom-in-95 duration-500">
+          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8 relative">
+            <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-25" />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12 text-primary">
+              <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
+            </svg>
+          </div>
+
+          <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">Lesson Mastered!</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-10 text-lg">You've successfully completed this unit with Ajibade.</p>
+
+          {completionStats && (
+            <div className="grid grid-cols-2 gap-4 mb-10">
+              <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <span className="text-sm font-semibold text-slate-400 uppercase tracking-wider block mb-1">Time Spent</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {Math.floor((completionStats.durationSeconds || 0) / 60)}m {(completionStats.durationSeconds || 0) % 60}s
+                </span>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <span className="text-sm font-semibold text-slate-400 uppercase tracking-wider block mb-1">Completion</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-white">100%</span>
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={() => navigate("/teach-me/class/units", { replace: true })}
+            className="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-2xl font-bold text-xl shadow-xl shadow-primary/25 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   if (!sessionId) return null;
   const isChatDisabled = !manualChatEnabled;
 
   return (
     <div className="fixed inset-0 flex flex-col bg-background-light dark:bg-slate-950 overflow-hidden">
+      <SessionCompleteModal />
       <ConfirmDialog
         isOpen={showExitDialog}
         title="End Session?"

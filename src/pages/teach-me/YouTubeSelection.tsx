@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Play,
@@ -16,6 +17,7 @@ import { useToastStore } from "@/lib/store/toastStore";
 
 export default function YouTubeSelection() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [videoData, setVideoData] = useState<{
@@ -101,7 +103,7 @@ export default function YouTubeSelection() {
 
     // Initialize player
     if ((window as any).YT && (window as any).YT.Player) {
-      
+
       if (!playerRef.current) {
         playerRef.current = new (window as any).YT.Player("hidden-player", {
           height: "0",
@@ -137,6 +139,7 @@ export default function YouTubeSelection() {
     setIsLoading(true);
     try {
       await classService.createYoutubeClass(url, videoData.duration);
+      await queryClient.invalidateQueries({ queryKey: ["classes"] });
       // Navigate to classes list with success message
       navigate("/classes", {
         state: {
