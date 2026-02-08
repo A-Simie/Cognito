@@ -37,6 +37,19 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+/**
+ * Redirects authenticated users to dashboard
+ */
+function RedirectIfAuthenticated({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuthStore();
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 import { AuthMiddleware } from "@/components/providers/AuthMiddleware";
 
 /**
@@ -54,7 +67,15 @@ export default function App() {
                 <Route
                   key={route.path}
                   path={route.path}
-                  element={route.element}
+                  element={
+                    route.path === "/" ? (
+                      <RedirectIfAuthenticated>
+                        {route.element}
+                      </RedirectIfAuthenticated>
+                    ) : (
+                      route.element
+                    )
+                  }
                 />
               ))}
 

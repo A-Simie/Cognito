@@ -221,7 +221,6 @@ export function LessonSession() {
           onPlayerReady={onPlayerReady}
           onStateChange={onStateChange}
           isQuizActive={isQuizActive}
-          isAudioFinished={isAudioFinished}
           isCurrentlyPausing={isCurrentlyPausing}
           manualChatEnabled={manualChatEnabled}
           isQuizFinished={isQuizFinished}

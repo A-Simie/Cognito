@@ -12,7 +12,6 @@ interface LessonContentAreaProps {
   onPlayerReady: () => void;
   onStateChange: (event: any) => void;
   isQuizActive: boolean;
-  isAudioFinished: boolean;
   isCurrentlyPausing: boolean;
   manualChatEnabled: boolean;
   isQuizFinished: boolean;
@@ -37,7 +36,6 @@ export function LessonContentArea({
   onPlayerReady,
   onStateChange,
   isQuizActive,
-  isAudioFinished,
   isCurrentlyPausing,
   manualChatEnabled,
   isQuizFinished,
@@ -75,7 +73,6 @@ export function LessonContentArea({
       )}
 
       {isQuizActive &&
-        isAudioFinished &&
         (!isYouTubeMode || isCurrentlyPausing) &&
         !manualChatEnabled &&
         currentStep?.stepPayload?.quizzesJson && (

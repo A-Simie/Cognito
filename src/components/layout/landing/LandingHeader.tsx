@@ -4,6 +4,7 @@ import { GraduationCap, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { cn } from "@/lib/utils/utils";
+import { useAuthStore } from "@/lib/store/authStore";
 
 interface LandingHeaderProps {
   scrolled: boolean;
@@ -17,6 +18,7 @@ export const LandingHeader = ({
   setIsMenuOpen,
 }: LandingHeaderProps) => {
   const location = useLocation();
+  const { isAuthenticated } = useAuthStore();
 
   return (
     <>
@@ -72,9 +74,9 @@ export const LandingHeader = ({
           <div className="flex-1 flex items-center justify-end gap-1 md:gap-4">
             <ThemeToggle />
             <div className="hidden md:flex items-center">
-              <Link to="/signup">
+              <Link to={isAuthenticated ? "/dashboard" : "/signup"}>
                 <Button className="h-10 px-6 rounded-full bg-blue-600 dark:bg-white text-white dark:text-white font-black text-[10px] uppercase tracking-wider hover:scale-105 transition-all border-none active:scale-95">
-                  Get Started
+                  {isAuthenticated ? "Dashboard" : "Get Started"}
                 </Button>
               </Link>
             </div>
@@ -125,9 +127,12 @@ export const LandingHeader = ({
                 </a>
               ))}
               <div className="pt-10 border-t border-slate-200 dark:border-white/10 flex flex-col">
-                <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
+                <Link
+                  to={isAuthenticated ? "/dashboard" : "/signup"}
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   <Button className="w-full h-16 text-xl bg-blue-600 text-white rounded-3xl font-black uppercase tracking-widest active:scale-95">
-                    Get Started
+                    {isAuthenticated ? "Dashboard" : "Get Started"}
                   </Button>
                 </Link>
               </div>
