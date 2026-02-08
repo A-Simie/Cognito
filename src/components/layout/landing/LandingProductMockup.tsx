@@ -296,7 +296,7 @@ export const LandingProductMockup = ({
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
       className="max-w-5xl mx-auto px-4 relative mt-10 group"
     >
-      <div className="relative p-1 bg-linear-to-b from-slate-200 dark:from-white/10 to-transparent rounded-3xl md:rounded-[40px] border w-full mx-auto border-slate-100 dark:border-white/5">
+      <div className="relative p-1 bg-linear-to-b from-slate-200 dark:from-white/10 to-transparent rounded-3xl md:rounded-[40px] border w-fit mx-auto border-slate-100 dark:border-white/5">
         <div className="bg-white/80 dark:bg-[#05070a]/90 backdrop-blur-3xl rounded-[28px] md:rounded-[36px] overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl flex flex-col h-[400px] md:h-auto md:min-h-[500px] lg:aspect-16/10 lg:max-h-[80vh]">
           <MacHeader />
 
