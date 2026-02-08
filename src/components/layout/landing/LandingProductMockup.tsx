@@ -53,15 +53,15 @@ const CHAT_MESSAGES: Message[] = [
 ];
 
 const MacHeader = () => (
-  <div className="h-12 border-b border-slate-200 dark:border-white/5 flex items-center px-6 gap-2 shrink-0">
+  <div className="h-12 border-b border-slate-200 dark:border-white/5 flex items-center px-4 md:px-6 gap-2 shrink-0">
     <div className="flex gap-2">
       <div className="w-3 h-3 rounded-full bg-[#FF5F56] shadow-inner" />
       <div className="w-3 h-3 rounded-full bg-[#FFBD2E] shadow-inner" />
       <div className="w-3 h-3 rounded-full bg-[#27C93F] shadow-inner" />
     </div>
-    <div className="ml-10 h-6 w-72 rounded-xl bg-slate-200/50 dark:bg-white/5 flex items-center px-3 gap-2 border border-slate-300 dark:border-white/10 shadow-inner">
-      <Lock className="w-2.5 h-2.5 text-slate-400" />
-      <div className="text-[9px] font-bold text-slate-400/80 tracking-tight">
+    <div className="ml-4 md:ml-10 h-6 flex-1 max-w-[200px] md:max-w-72 rounded-xl bg-slate-200/50 dark:bg-white/5 flex items-center px-3 gap-2 border border-slate-300 dark:border-white/10 shadow-inner">
+      <Lock className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+      <div className="text-[9px] font-bold text-slate-400/80 tracking-tight truncate">
         cognition-agent.ai
       </div>
     </div>
@@ -296,7 +296,7 @@ export const LandingProductMockup = ({
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
       className="max-w-5xl mx-auto px-4 relative mt-10 group"
     >
-      <div className="relative p-1 bg-linear-to-b from-slate-200 dark:from-white/10 to-transparent rounded-3xl md:rounded-[40px] border w-fit border-slate-100 dark:border-white/5">
+      <div className="relative p-1 bg-linear-to-b from-slate-200 dark:from-white/10 to-transparent rounded-3xl md:rounded-[40px] border w-full mx-auto border-slate-100 dark:border-white/5">
         <div className="bg-white/80 dark:bg-[#05070a]/90 backdrop-blur-3xl rounded-[28px] md:rounded-[36px] overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl flex flex-col h-[400px] md:h-auto md:min-h-[500px] lg:aspect-16/10 lg:max-h-[80vh]">
           <MacHeader />
 
