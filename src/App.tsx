@@ -37,54 +37,38 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      retry: 1,
-    },
-  },
-});
-
 /**
  * Main App component
  */
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <BrowserRouter>
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              {/* Public routes */}
-              {publicRoutes.map((route) => (
-                <Route
-                  key={route.path}
-                  path={route.path}
-                  element={route.element}
-                />
-              ))}
-
-              {/* Protected routes */}
-              {protectedRoutes.map((route) => (
-                <Route
-                  key={route.path}
-                  path={route.path}
-                  element={<PrivateRoute>{route.element}</PrivateRoute>}
-                />
-              ))}
-
-              {/* 404 Not Found */}
+    <ThemeProvider>
+      <BrowserRouter>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            {/* Public routes */}
+            {publicRoutes.map((route) => (
               <Route
-                path={notFoundRoute.path}
-                element={notFoundRoute.element}
+                key={route.path}
+                path={route.path}
+                element={route.element}
               />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </ThemeProvider>
-    </QueryClientProvider>
+            ))}
+
+            {/* Protected routes */}
+            {protectedRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={<PrivateRoute>{route.element}</PrivateRoute>}
+              />
+            ))}
+
+            {/* 404 Not Found */}
+            <Route path={notFoundRoute.path} element={notFoundRoute.element} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }

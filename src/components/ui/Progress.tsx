@@ -34,7 +34,7 @@ export function Progress({
           className={cn(
             "h-full rounded-full transition-all duration-500 ease-out",
             variant === "gradient"
-              ? "bg-gradient-to-r from-primary to-blue-500"
+              ? "bg-linear-to-r from-primary to-blue-500"
               : "bg-primary",
           )}
           style={{ width: `${percentage}%` }}
