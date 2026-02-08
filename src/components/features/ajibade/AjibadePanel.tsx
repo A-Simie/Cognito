@@ -26,6 +26,7 @@ interface AjibadePanelProps {
   disabled?: boolean;
   currentStepText?: string | null;
   onPlaybackEnded?: () => void;
+  onAudioStatusChange?: (isPlaying: boolean) => void;
 }
 
 const INITIAL_MESSAGES: Message[] = [];
@@ -64,6 +65,7 @@ export function AjibadePanel({
   disabled = false,
   currentStepText,
   onPlaybackEnded,
+  onAudioStatusChange,
 }: AjibadePanelProps) {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
@@ -118,6 +120,7 @@ export function AjibadePanel({
     activeSourcesRef.current = [];
     isPlayingRef.current = false;
     setIsPlayingAudio(false);
+    onAudioStatusChange?.(false);
     nextStartTimeRef.current = 0;
 
     if (playbackTimeoutRef.current) {
@@ -170,8 +173,12 @@ export function AjibadePanel({
         );
       };
 
-      isPlayingRef.current = true;
-      setIsPlayingAudio(true);
+      if (!isPlayingRef.current) {
+        isPlayingRef.current = true;
+        setIsPlayingAudio(true);
+        // Synchronously notify parent that audio is starting
+        onAudioStatusChange?.(true);
+      }
 
       if (playbackTimeoutRef.current) {
         clearTimeout(playbackTimeoutRef.current);
@@ -186,6 +193,8 @@ export function AjibadePanel({
         ) {
           isPlayingRef.current = false;
           setIsPlayingAudio(false);
+          // Notify parent that audio has ended
+          onAudioStatusChange?.(false);
           onPlaybackEndedRef.current?.();
         }
       }, timeUntilEnd + 100);
