@@ -125,8 +125,8 @@ export function LessonUnitsList() {
                       </h3>
                       <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
                         {isCompleted && (
-                          <span className="text-emerald-500 italic lowercase font-medium">
-                            — completed
+                          <span className="text-emerald-500 lowercase font-medium">
+                          completed
                           </span>
                         )}
                       </div>

@@ -118,7 +118,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
             ))}
           </div>
           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">
-            AI is curating content
+            Cognito is curating content
           </span>
         </motion.div>
       </div>
