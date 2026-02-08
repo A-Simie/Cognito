@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 export const LandingTestimonial = () => (
-  <section className="py-20 md:py-40 px-6 bg-slate-50/50 dark:bg-white/1 text-center">
+  <section className="py-20 md:py-40 px-6 text-center">
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}

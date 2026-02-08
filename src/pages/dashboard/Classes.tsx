@@ -18,68 +18,73 @@ import { cn } from "@/lib/utils/utils";
 
 import { useClasses } from "@/lib/hooks/useClasses";
 
-export default function Classes() {
-  const { data: classes = [], isLoading: loading } = useClasses();
-  const { state } = useLocation();
-  const navigate = useNavigate();
-  const [showBanner, setShowBanner] = useState(!!state?.message);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const newClassId = state?.newClassId;
+interface CreationDialogProps {
+  onClose: () => void;
+  onNavigate: (path: string) => void;
+}
 
-  const CreationDialog = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl p-6 border border-slate-100 dark:border-slate-800"
-      >
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            Create New Class
-          </h2>
-          <button
-            onClick={() => setShowCreateDialog(false)}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+const CreationDialog = ({ onClose, onNavigate }: CreationDialogProps) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+    />
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+      transition={{ type: "spring", duration: 0.4, bounce: 0.2 }}
+      className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl p-6 border border-slate-100 dark:border-slate-800 relative z-10"
+    >
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+          Create New Class
+        </h2>
+        <button
+          onClick={onClose}
+          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
 
-        <div className="grid gap-4">
-          <button
-            onClick={() => navigate("/teach-me/topic")}
-            className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
-          >
-            <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-              <BookOpen className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
-                From a Topic
-              </h3>
-              <p className="text-sm text-slate-500">
-                Let AI generate a curriculum from any topic you choose.
-              </p>
-            </div>
-          </button>
+      <div className="grid gap-4">
+        <button
+          onClick={() => onNavigate("/teach-me/topic")}
+          className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:bg-primary/5 transition-all text-left cursor-pointer"
+        >
+          <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+            <BookOpen className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+              From a Topic
+            </h3>
+            <p className="text-sm text-slate-500">
+              Let AI generate a curriculum from any topic you choose.
+            </p>
+          </div>
+        </button>
 
-          <button
-            onClick={() => navigate("/teach-me/youtube-setup")}
-            className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-red-500/50 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all text-left"
-          >
-            <div className="w-12 h-12 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform">
-              <Youtube className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-600 transition-colors">
-                From YouTube
-              </h3>
-              <p className="text-sm text-slate-500">
-                Turn any YouTube video into an interactive lesson.
-              </p>
-            </div>
-          </button>
+        <button
+          onClick={() => onNavigate("/teach-me/youtube-setup")}
+          className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-red-500/50 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all text-left cursor-pointer"
+        >
+          <div className="w-12 h-12 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform">
+            <Youtube className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-600 transition-colors">
+              From YouTube
+            </h3>
+            <p className="text-sm text-slate-500">
+              Turn any YouTube video into an interactive lesson.
+            </p>
+          </div>
+        </button>
 
           <button
             onClick={() => navigate("/teach-me/pdf-setup")}
@@ -307,7 +312,12 @@ export default function Classes() {
 
         {/* Creation Dialog */}
         <AnimatePresence>
-          {showCreateDialog && <CreationDialog />}
+          {showCreateDialog && (
+            <CreationDialog
+              onClose={() => setShowCreateDialog(false)}
+              onNavigate={navigate}
+            />
+          )}
         </AnimatePresence>
       </div>
     </AppLayout>

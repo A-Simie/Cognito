@@ -1,6 +1,5 @@
 import { motion, MotionValue } from "framer-motion";
 import {
-  Brain,
   GraduationCap,
   Play,
   FileText,
@@ -28,7 +27,7 @@ export const LandingEcosystem = ({
     <section
       id="ecosystem"
       ref={ecoRef}
-      className="pt-24 pb-32 md:pt-32 md:pb-56 px-6 relative bg-slate-50/50 dark:bg-[#05070a]/50 border-b border-slate-100 dark:border-white/5"
+      className="pt-24 pb-32 md:pt-32 md:pb-56 px-6 relative"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-24">
@@ -38,8 +37,7 @@ export const LandingEcosystem = ({
             viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6"
           >
-            <Brain className="w-3.5 h-3.5" />
-            The Intelligence Layer
+            Cognito Ecosystem
           </motion.div>
           <h2 className="text-4xl md:text-8xl font-black mb-8 leading-[0.9] tracking-tighter">
             Everything needed to <br />
@@ -59,11 +57,11 @@ export const LandingEcosystem = ({
             style={{ y: ecoY1 }}
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
             whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             whileHover={{ y: -8, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 md:p-10 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all min-h-[300px] md:min-h-[350px] active:scale-95"
+            whileTap={{ scale: 0.95 }}
+            className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col justify-between shadow-sm hover:shadow-2xl hover:border-blue-500/20 transition-colors duration-300 min-h-[300px] md:min-h-[350px]"
           >
             <div className="relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center mb-10 shadow-lg shadow-blue-500/20">
@@ -87,15 +85,15 @@ export const LandingEcosystem = ({
             style={{ y: ecoY2 }}
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
             whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.1,
               ease: [0.16, 1, 0.3, 1],
             }}
             whileHover={{ y: -8, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="md:col-span-3 lg:col-span-8 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-[#f8fafc] dark:bg-blue-900/10 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col lg:flex-row gap-8 md:gap-10 items-center shadow-sm hover:shadow-2xl transition-all min-h-[300px] md:min-h-[350px] active:scale-95"
+            whileTap={{ scale: 0.95 }}
+            className="md:col-span-3 lg:col-span-8 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-[#f8fafc] dark:bg-blue-900/10 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col lg:flex-row gap-8 md:gap-10 items-center shadow-sm hover:shadow-2xl hover:border-blue-500/20 transition-colors duration-300 min-h-[300px] md:min-h-[350px]"
           >
             <div className="flex-1 relative z-10">
               <div className="w-12 h-12 rounded-xl bg-red-500 flex items-center justify-center mb-8 shadow-lg shadow-red-500/20">
@@ -121,15 +119,15 @@ export const LandingEcosystem = ({
             style={{ y: ecoY3 }}
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
             whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.2,
               ease: [0.16, 1, 0.3, 1],
             }}
             whileHover={{ y: -8, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all min-h-[300px] md:min-h-[280px] active:scale-95"
+            whileTap={{ scale: 0.95 }}
+            className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col justify-between shadow-sm hover:shadow-2xl hover:border-blue-500/20 transition-colors duration-300 min-h-[300px] md:min-h-[280px]"
           >
             <div className="w-12 h-12 rounded-xl bg-sky-500 flex items-center justify-center mb-8">
               <FileText className="w-6 h-6 text-white" />
@@ -149,15 +147,15 @@ export const LandingEcosystem = ({
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
             whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.3,
               ease: [0.16, 1, 0.3, 1],
             }}
             whileHover={{ y: -8, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="md:col-span-3 lg:col-span-8 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-blue-600 p-6 md:p-12 flex flex-col lg:flex-row items-start gap-8 md:gap-10 shadow-xl shadow-blue-500/20 transition-all min-h-[300px] md:min-h-[280px] active:scale-95"
+            whileTap={{ scale: 0.95 }}
+            className="md:col-span-3 lg:col-span-8 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-blue-600 p-6 md:p-12 flex flex-col lg:flex-row items-start gap-8 md:gap-10 shadow-xl shadow-blue-500/20 transition-colors duration-300 min-h-[300px] md:min-h-[280px]"
           >
             <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-xl flex items-center justify-center mb-8 md:mb-0">
               <Sparkles className="w-6 h-6 text-white" />
@@ -180,15 +178,15 @@ export const LandingEcosystem = ({
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
             whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.1,
               ease: [0.16, 1, 0.3, 1],
             }}
             whileHover={{ y: -8, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all min-h-[300px] active:scale-95"
+            whileTap={{ scale: 0.95 }}
+            className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col justify-between shadow-sm hover:shadow-2xl hover:border-blue-500/20 transition-colors duration-300 min-h-[300px]"
           >
             <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center mb-8">
               <Target className="w-6 h-6 text-white" />
@@ -208,15 +206,15 @@ export const LandingEcosystem = ({
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
             whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.2,
               ease: [0.16, 1, 0.3, 1],
             }}
             whileHover={{ y: -8, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-slate-900 border border-slate-800 p-6 md:p-12 flex flex-col justify-between shadow-2xl transition-all min-h-[300px] active:scale-95"
+            whileTap={{ scale: 0.95 }}
+            className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-slate-900 border border-slate-800 p-6 md:p-12 flex flex-col justify-between shadow-2xl transition-colors duration-300 min-h-[300px]"
           >
             <div className="flex-1">
               <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center mb-8">
@@ -249,15 +247,15 @@ export const LandingEcosystem = ({
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
             whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.3,
               ease: [0.16, 1, 0.3, 1],
             }}
             whileHover={{ y: -8, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="md:col-span-6 lg:col-span-4 group cursor-pointer relative overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col justify-between shadow-sm hover:shadow-2xl transition-all min-h-[300px] active:scale-95"
+            whileTap={{ scale: 0.95 }}
+            className="md:col-span-6 lg:col-span-4 group cursor-pointer relative overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col justify-between shadow-sm hover:shadow-2xl hover:border-blue-500/20 transition-colors duration-300 min-h-[300px]"
           >
             <div className="w-12 h-12 rounded-xl bg-yellow-500 flex items-center justify-center mb-8">
               <Zap className="w-6 h-6 text-white" />

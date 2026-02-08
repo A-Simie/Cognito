@@ -1,6 +1,6 @@
 export const LandingBackground = () => (
   <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-    <div className="absolute inset-0 bg-slate-50 dark:bg-[#02040c]" />
+    <div className="absolute inset-0 bg-background-light dark:bg-[#02040c]" />
 
     <div className="absolute inset-0 opacity-10 dark:opacity-40">
       <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08)_0%,transparent_70%)] dark:bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.12)_0%,transparent_70%)] blur-[140px]" />

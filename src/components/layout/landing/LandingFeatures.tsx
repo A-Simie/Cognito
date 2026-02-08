@@ -5,10 +5,7 @@ import { FEATURES } from "@/lib/constants/landing";
 
 export const LandingFeatures = () => {
   return (
-    <section
-      id="features"
-      className="py-32 md:py-56 px-6 relative dark:border-white/5"
-    >
+    <section id="features" className="py-32 md:py-56 px-6 relative">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-end justify-between mb-16 md:mb-24 gap-8">
           <div className="max-w-xl">
@@ -29,10 +26,9 @@ export const LandingFeatures = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
               className={cn(
-                "group relative p-10 rounded-3xl border border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/1 hover:bg-white dark:hover:bg-white/2 transition-all duration-500 cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl hover:border-blue-500/20 active:scale-95",
+                "group relative p-10 rounded-3xl border border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/1 hover:bg-white dark:hover:bg-white/2 transition-colors duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl hover:border-blue-500/20 active:scale-95",
                 feature.className,
               )}
             >

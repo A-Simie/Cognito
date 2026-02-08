@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { GraduationCap } from "lucide-react";
 
 export const LandingFooter = () => (
-  <footer className="relative z-10 py-20 md:py-32 px-6 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-[#02040c]">
+  <footer className="relative z-10 py-20 md:py-32 px-6">
     <div className="max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between gap-16 md:gap-24">
         <div className="max-w-sm">

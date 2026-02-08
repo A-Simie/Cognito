@@ -63,7 +63,7 @@ export default function VerifyOtp({ type }: VerifyOtpProps) {
       : "Enter the code sent to your email. Please check your spam folder if you don't see it in inbox.";
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#02040a] text-slate-900 dark:text-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background-light dark:bg-[#02040a] text-slate-900 dark:text-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <button
           type="button"
