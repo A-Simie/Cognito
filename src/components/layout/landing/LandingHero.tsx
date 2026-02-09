@@ -42,7 +42,7 @@ export const LandingHero = ({ heroRef, opacity, scale }: LandingHeroProps) => {
               </motion.span>
             ))}
             <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-linear-to-b from-blue-700 via-blue-600 to-blue-800 bg-size-[200%_auto] animate-gradient-x">
+            <span className="block md:inline-block text-transparent bg-clip-text bg-linear-to-r from-blue-700 via-blue-600 to-blue-800 bg-size-[200%_auto] animate-gradient-x px-2 -mx-2">
               {["Master", "Any", "Topic."].map((word, i) => (
                 <motion.span
                   key={i}

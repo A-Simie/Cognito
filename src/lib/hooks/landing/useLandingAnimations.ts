@@ -1,10 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { useScroll, useTransform, useSpring } from "framer-motion";
 import { DemoStatus } from "@/lib/types/landing";
-import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 
 export function useLandingAnimations() {
-  const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [demoStatus, setDemoStatus] = useState<DemoStatus>("extracting");
@@ -31,10 +29,7 @@ export function useLandingAnimations() {
   const mockupY = useSpring(rawMockupY, springConfig);
   const innerMockupY = useSpring(rawInnerMockupY, springConfig);
   const opacity = useSpring(rawOpacity, springConfig);
-  const scale = useSpring(
-    isMobile ? useTransform(() => 1) : rawScale,
-    springConfig,
-  );
+  const scale = useSpring(rawScale, springConfig);
 
   const { scrollYProgress: ecoScroll } = useScroll({
     target: ecoRef,

@@ -47,7 +47,7 @@ export const LandingEcosystem = ({
               learn anything.
             </span>
           </h2>
-          <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
             A complete suite of tools designed to turn any content into an
             interactive learning experience.
           </p>

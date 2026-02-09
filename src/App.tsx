@@ -4,17 +4,23 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { useAuthStore } from "@/lib/store/authStore";
 import { publicRoutes, protectedRoutes, notFoundRoute } from "@/config/routes";
 
+import { GraduationCap } from "lucide-react";
+
 /**
  * Loading fallback component
  */
 function LoadingFallback() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="text-center">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate-600 font-bold dark:text-slate-400">
-          LOADING...
-        </p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background-light dark:bg-background-night transition-colors duration-500">
+      <div className="relative flex flex-col items-center">
+        <div className="w-16 h-16 bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-2xl shadow-lg flex items-center justify-center mb-4 animate-pulse">
+          <GraduationCap className="w-8 h-8 text-primary drop-shadow-sm" />
+        </div>
+
+        {/* Branding */}
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-[0.2em] uppercase opacity-90 animate-fade-in">
+          Cognito
+        </h2>
       </div>
     </div>
   );
