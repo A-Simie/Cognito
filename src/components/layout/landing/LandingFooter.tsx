@@ -27,19 +27,19 @@ export const LandingFooter = () => (
             <div className="flex flex-col gap-4 text-sm font-bold tracking-tight text-slate-500 dark:text-slate-400">
               <a
                 href="#features"
-                className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
+                className="hover:text-blue-600 dark:hover:text-blue-500 active:text-blue-600 transition-colors"
               >
                 Features
               </a>
               <a
                 href="#ecosystem"
-                className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
+                className="hover:text-blue-600 dark:hover:text-blue-500 active:text-blue-600 transition-colors"
               >
                 Ecosystem
               </a>
               <a
                 href="#workflow"
-                className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
+                className="hover:text-blue-600 dark:hover:text-blue-500 active:text-blue-600 transition-colors"
               >
                 Workflow
               </a>
@@ -52,13 +52,13 @@ export const LandingFooter = () => (
             <div className="flex flex-col gap-4 text-sm font-bold tracking-tight text-slate-500 dark:text-slate-400">
               <Link
                 to="/privacy"
-                className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
+                className="hover:text-blue-600 dark:hover:text-blue-500 active:text-blue-600 transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
                 to="/terms"
-                className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
+                className="hover:text-blue-600 dark:hover:text-blue-500 active:text-blue-600 transition-colors"
               >
                 Terms of Service
               </Link>

@@ -142,14 +142,14 @@ const Sidebar = ({ innerMockupY }: { innerMockupY: MotionValue<number> }) => (
 
 const ActiveLearningCard = ({ demoStatus }: { demoStatus: DemoStatus }) => (
   <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-4 h-48 mb-4 shrink-0">
-    <div className="rounded-2xl overflow-hidden relative group border border-slate-200 dark:border-white/10 shadow-lg transition-transform hover:scale-[1.02]">
+    <div className="rounded-2xl overflow-hidden relative group border border-slate-200 dark:border-white/10 shadow-lg transition-transform hover:scale-[1.02] active:scale-[1.02]">
       <img
         src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800"
         className="w-full h-full object-cover opacity-80"
         alt="AI Visualization"
       />
       <div className="absolute inset-0 bg-blue-900/40 flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 flex items-center justify-center group-hover:scale-110 transition-transform">
+        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 flex items-center justify-center group-hover:scale-110 group-active:scale-110 transition-transform">
           <Play className="w-5 h-5 text-white fill-current" />
         </div>
       </div>
@@ -239,12 +239,12 @@ const ChatMessage = forwardRef<HTMLDivElement, { msg: Message }>(
 ChatMessage.displayName = "ChatMessage";
 
 const InputArea = () => (
-  <div className="mt-auto h-14 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 backdrop-blur-xl flex items-center px-5 gap-4 shadow-inner shrink-0 z-20 relative transition-colors hover:bg-white hover:dark:bg-white/10">
+  <div className="mt-auto h-14 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 backdrop-blur-xl flex items-center px-5 gap-4 shadow-inner shrink-0 z-20 relative transition-colors hover:bg-white hover:dark:bg-white/10 active:bg-white dark:active:bg-white/10">
     <div className="flex-1 text-sm font-bold text-slate-400 dark:text-slate-500">
       Message Ajibade...
     </div>
-    <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30 cursor-pointer hover:scale-105 transition-all active:scale-95 group/send">
-      <Zap className="w-4 h-4 text-white group-hover/send:rotate-12 transition-transform" />
+    <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30 cursor-pointer hover:scale-105 transition-all active:scale-95 group/send group-active/send:scale-105">
+      <Zap className="w-4 h-4 text-white group-hover/send:rotate-12 group-active/send:rotate-12 transition-transform" />
     </div>
   </div>
 );

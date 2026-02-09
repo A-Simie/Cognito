@@ -41,7 +41,7 @@ export const LandingHeader = ({
               to="/"
               className="flex items-center gap-2 md:gap-3 group shrink-0"
             >
-              <div className="w-8 h-8 flex items-center justify-center group-hover:rotate-12 transition-transform">
+              <div className="w-8 h-8 flex items-center justify-center group-hover:rotate-12 group-active:rotate-12 transition-transform">
                 <GraduationCap className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <span className="text-sm md:text-base font-black tracking-tight uppercase">
@@ -53,19 +53,19 @@ export const LandingHeader = ({
           <nav className="hidden md:flex items-center gap-6 lg:gap-10 text-[8px] lg:text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">
             <a
               href={location.pathname === "/" ? "#ecosystem" : "/#ecosystem"}
-              className="hover:text-blue-600 transition-colors"
+              className="hover:text-blue-600 active:text-blue-600 transition-colors"
             >
               Ecosystem
             </a>
             <a
               href={location.pathname === "/" ? "#features" : "/#features"}
-              className="hover:text-blue-600 transition-colors"
+              className="hover:text-blue-600 active:text-blue-600 transition-colors"
             >
               Features
             </a>
             <a
               href={location.pathname === "/" ? "#workflow" : "/#workflow"}
-              className="hover:text-blue-600 transition-colors"
+              className="hover:text-blue-600 active:text-blue-600 transition-colors"
             >
               Workflow
             </a>

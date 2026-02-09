@@ -9,6 +9,7 @@ import {
   Activity,
   Zap,
 } from "lucide-react";
+import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 
 interface LandingEcosystemProps {
   ecoRef: React.RefObject<HTMLDivElement>;
@@ -23,6 +24,7 @@ export const LandingEcosystem = ({
   ecoY2,
   ecoY3,
 }: LandingEcosystemProps) => {
+  const isMobile = useIsMobile();
   return (
     <section
       id="ecosystem"
@@ -56,9 +58,23 @@ export const LandingEcosystem = ({
           <motion.div
             style={{ y: ecoY1 }}
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+            whileInView={{
+              opacity: 1,
+              scale: isMobile ? [1, 1.02, 1] : 1,
+              y: isMobile ? [0, -8, 0] : 0,
+              rotateX: 0,
+            }}
             viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{
+              duration: 1,
+              ease: [0.16, 1, 0.3, 1],
+              scale: isMobile
+                ? { duration: 0.8, times: [0, 0.5, 1] }
+                : { duration: 1 },
+              y: isMobile
+                ? { duration: 0.8, times: [0, 0.5, 1] }
+                : { duration: 1 },
+            }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
             className="md:col-span-3 lg:col-span-4 cursor-pointer group relative overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 md:p-12 flex flex-col justify-between shadow-sm hover:shadow-2xl hover:border-blue-500/20 transition-colors duration-300 min-h-[300px] md:min-h-[350px]"
@@ -84,12 +100,19 @@ export const LandingEcosystem = ({
           <motion.div
             style={{ y: ecoY2 }}
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+            whileInView={{
+              opacity: 1,
+              scale: isMobile ? [1, 1.02, 1] : 1,
+              y: isMobile ? [0, -8, 0] : 0,
+              rotateX: 0,
+            }}
             viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.1,
               ease: [0.16, 1, 0.3, 1],
+              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -118,12 +141,19 @@ export const LandingEcosystem = ({
           <motion.div
             style={{ y: ecoY3 }}
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+            whileInView={{
+              opacity: 1,
+              scale: isMobile ? [1, 1.02, 1] : 1,
+              y: isMobile ? [0, -8, 0] : 0,
+              rotateX: 0,
+            }}
             viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.2,
               ease: [0.16, 1, 0.3, 1],
+              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -146,12 +176,19 @@ export const LandingEcosystem = ({
           {/* Feature 4: Ajibade - Wide/Medium */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+            whileInView={{
+              opacity: 1,
+              scale: isMobile ? [1, 1.02, 1] : 1,
+              y: isMobile ? [0, -8, 0] : 0,
+              rotateX: 0,
+            }}
             viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.3,
               ease: [0.16, 1, 0.3, 1],
+              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -177,12 +214,19 @@ export const LandingEcosystem = ({
           {/* Feature 5: Quizzes - Vertical */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+            whileInView={{
+              opacity: 1,
+              scale: isMobile ? [1, 1.02, 1] : 1,
+              y: isMobile ? [0, -8, 0] : 0,
+              rotateX: 0,
+            }}
             viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.1,
               ease: [0.16, 1, 0.3, 1],
+              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -205,12 +249,19 @@ export const LandingEcosystem = ({
           {/* Feature 6: Analytics - Small Square */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+            whileInView={{
+              opacity: 1,
+              scale: isMobile ? [1, 1.02, 1] : 1,
+              y: isMobile ? [0, -8, 0] : 0,
+              rotateX: 0,
+            }}
             viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.2,
               ease: [0.16, 1, 0.3, 1],
+              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -246,12 +297,19 @@ export const LandingEcosystem = ({
           {/* Feature 7: Live Sessions - Small Square */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+            whileInView={{
+              opacity: 1,
+              scale: isMobile ? [1, 1.02, 1] : 1,
+              y: isMobile ? [0, -8, 0] : 0,
+              rotateX: 0,
+            }}
             viewport={{ once: true }}
             transition={{
               duration: 1,
               delay: 0.3,
               ease: [0.16, 1, 0.3, 1],
+              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}

@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
 import { WORKFLOW_STEPS } from "@/lib/constants/landing";
+import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 
 export const LandingWorkflow = () => {
+  const isMobile = useIsMobile();
   return (
     <section
       id="workflow"
       className="py-32 md:py-64 px-6 relative overflow-hidden"
     >
-      {/* Background Narrative: The Void */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(37,99,235,0.03),transparent_70%)] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -27,25 +28,30 @@ export const LandingWorkflow = () => {
         </h2>
 
         <div className="relative space-y-40">
-          {/* The Signal Stream (Vertical Line) */}
           <div className="absolute left-1/2 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-blue-500/50 to-transparent -translate-x-1/2" />
 
           {WORKFLOW_STEPS.map((step, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+                scale: isMobile ? [1, 1.05, 1] : 1,
+              }}
               viewport={{ once: true, margin: "-100px" }}
+              transition={{
+                duration: 0.8,
+                scale: isMobile ? { duration: 1, times: [0, 0.5, 1] } : {},
+              }}
               className="relative flex flex-col items-center group"
             >
-              {/* The "Crystal" - A bespoke geometric representation of the step */}
               <div className="relative mb-16">
-                <div className="absolute inset-0 bg-blue-600/20 blur-[60px] rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                <div className="absolute inset-0 bg-blue-600/20 blur-[60px] rounded-full scale-150 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-1000" />
 
                 <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center relative">
-                  {/* Custom Geometric Shapes instead of generic icons */}
                   {i === 0 && (
-                    <div className="w-full h-full border border-blue-500/20 rotate-45 flex items-center justify-center group-hover:rotate-135 transition-transform duration-1000">
+                    <div className="w-full h-full border border-blue-500/20 rotate-45 flex items-center justify-center group-hover:rotate-135 group-active:rotate-135 transition-transform duration-1000">
                       <div className="w-1/2 h-1/2 border border-blue-500/40" />
                     </div>
                   )}
@@ -72,7 +78,7 @@ export const LandingWorkflow = () => {
                   )}
 
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-[10px] font-black text-blue-600/40 group-hover:text-blue-600 transition-colors uppercase tracking-widest">
+                    <span className="text-[10px] font-black text-blue-600/40 group-hover:text-blue-600 group-active:text-blue-600 transition-colors uppercase tracking-widest">
                       {step.n}
                     </span>
                   </div>
@@ -80,7 +86,7 @@ export const LandingWorkflow = () => {
               </div>
 
               <div className="max-w-lg">
-                <h3 className="text-3xl md:text-5xl font-black mb-6 tracking-tight group-hover:text-blue-600 transition-colors duration-500">
+                <h3 className="text-3xl md:text-5xl font-black mb-6 tracking-tight group-hover:text-blue-600 group-active:text-blue-600 transition-colors duration-500">
                   {step.t}
                 </h3>
                 <p className="text-slate-500 dark:text-slate-400 text-lg md:text-xl font-medium leading-relaxed tracking-tight text-center">
@@ -88,7 +94,6 @@ export const LandingWorkflow = () => {
                 </p>
               </div>
 
-              {/* Connection Indicator */}
               {i !== WORKFLOW_STEPS.length - 1 && (
                 <div className="mt-20 flex flex-col items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-blue-500/20" />

@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/Button";
 
 export const LandingCTA = () => (
   <section className="py-12 md:py-24 px-6 md:mb-12">
-    <div className="max-w-4xl mx-auto rounded-3xl md:rounded-[48px] bg-slate-900 p-8 md:p-16 text-center relative overflow-hidden group border border-slate-800 dark:border-blue-500/20 shadow-2xl">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.15),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+    <div className="max-w-4xl mx-auto rounded-3xl md:rounded-[48px] bg-slate-900 p-8 md:p-16 text-center relative overflow-hidden group border border-slate-800 dark:border-blue-500/20 shadow-2xl active:border-blue-500/40 transition-colors">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.15),transparent)] opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-1000" />
       <div className="relative z-10">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tight mb-8 md:mb-10 max-w-3xl mx-auto">
           Master any domain.
@@ -15,7 +15,7 @@ export const LandingCTA = () => (
           their learning potential.
         </p>
         <Link to="/signup" className="inline-block w-full sm:w-auto">
-          <Button className="w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 rounded-2xl bg-blue-600 text-white font-black text-lg md:text-xl shadow-2xl hover:bg-blue-700 hover:scale-105 transition-all active:scale-95 border-none">
+          <Button className="w-full sm:w-auto h-14 md:h-16 px-10 md:px-12 rounded-2xl bg-blue-600 text-white font-black text-lg md:text-xl shadow-2xl hover:bg-blue-700 hover:scale-105 transition-all active:scale-95 active:bg-blue-700 border-none">
             Get Started
             <ChevronRight className="ml-2 w-5 h-5" />
           </Button>
