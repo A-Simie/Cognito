@@ -26,39 +26,26 @@ export const LandingHero = ({ heroRef, opacity, scale }: LandingHeroProps) => {
 
         <motion.div style={{ opacity, scale: isMobile ? 1 : scale }}>
           <h1 className="text-4xl md:text-7xl lg:text-9xl font-black leading-tight md:leading-[0.9] tracking-[-0.05em] mb-8 md:mb-12 max-w-6xl mx-auto">
-            {["The", "Intelligence", "Layer."].map((word, i) => (
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.8,
-                  delay: i * 0.1,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="inline-block mr-[0.2em]"
-              >
-                {word}
-              </motion.span>
-            ))}
-            <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-linear-to-b from-blue-700 via-blue-600 to-blue-800 bg-size-[200%_auto] animate-gradient-x">
-              {["Master", "Any", "Topic."].map((word, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.8,
-                    delay: 0.4 + i * 0.1,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className="inline-block mr-[0.2em]"
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </span>
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="block"
+            >
+              The Intelligence Layer.
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.8,
+                delay: 0.2,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="block text-transparent bg-clip-text bg-linear-to-r from-blue-700 via-blue-600 to-blue-800 bg-size-[200%_auto] animate-gradient-x px-2 -mx-2"
+            >
+              Master Any Topic.
+            </motion.span>
           </h1>
         </motion.div>
 

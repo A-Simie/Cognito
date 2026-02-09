@@ -2,8 +2,10 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import { FEATURES } from "@/lib/constants/landing";
+import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 
 export const LandingFeatures = () => {
+  const isMobile = useIsMobile();
   return (
     <section id="features" className="py-32 md:py-56 px-6 relative">
       <div className="max-w-7xl mx-auto">
@@ -23,23 +25,28 @@ export const LandingFeatures = () => {
           {FEATURES.map((feature, i) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{
+                opacity: isMobile ? 0.8 : 0,
+                y: isMobile ? 20 : 20,
+                scale: isMobile ? 0.98 : 1,
+              }}
               whileInView={{
                 opacity: 1,
                 y: 0,
+                scale: 1,
               }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{
                 duration: 0.8,
-                delay: i * 0.1,
+                delay: isMobile ? 0 : i * 0.1,
                 ease: "easeOut",
               }}
               className={cn(
-                "group relative p-10 rounded-3xl border border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/1 hover:bg-white dark:hover:bg-white/2 transition-colors duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl hover:border-blue-500/20 md:active:scale-95 active:bg-white dark:active:bg-white/2 active:shadow-2xl active:border-blue-500/20",
+                "group relative p-10 rounded-3xl border border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/1 hover:bg-white dark:hover:bg-white/2 transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl hover:border-blue-500/20 active:scale-95",
                 feature.className,
               )}
             >
-              <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-100 group-active:opacity-100 group-hover:translate-x-[-10px] group-hover:translate-y-[10px] group-active:translate-x-[-10px] group-active:translate-y-[10px] transition-all duration-500">
+              <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-100 group-active:opacity-100 translate-x-0 translate-y-0 group-hover:translate-x-[-10px] group-hover:translate-y-[10px] transition-all duration-500">
                 <ArrowUpRight className="w-6 h-6 text-blue-600" />
               </div>
 

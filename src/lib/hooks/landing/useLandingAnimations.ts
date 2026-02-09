@@ -1,13 +1,9 @@
 import { useRef, useState, useEffect } from "react";
 import { useScroll, useTransform, useSpring } from "framer-motion";
-import { DemoStatus } from "@/lib/types/landing";
-import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 
 export function useLandingAnimations() {
-  const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [demoStatus, setDemoStatus] = useState<DemoStatus>("extracting");
   const heroRef = useRef<HTMLDivElement>(null);
   const ecoRef = useRef<HTMLDivElement>(null);
 
@@ -31,10 +27,7 @@ export function useLandingAnimations() {
   const mockupY = useSpring(rawMockupY, springConfig);
   const innerMockupY = useSpring(rawInnerMockupY, springConfig);
   const opacity = useSpring(rawOpacity, springConfig);
-  const scale = useSpring(
-    isMobile ? useTransform(() => 1) : rawScale,
-    springConfig,
-  );
+  const scale = useSpring(rawScale, springConfig);
 
   const { scrollYProgress: ecoScroll } = useScroll({
     target: ecoRef,
@@ -42,15 +35,15 @@ export function useLandingAnimations() {
   });
 
   const ecoY1 = useSpring(
-    useTransform(ecoScroll, [0, 1], [40, -40]),
+    useTransform(ecoScroll, [0, 1], [30, -30]),
     springConfig,
   );
   const ecoY2 = useSpring(
-    useTransform(ecoScroll, [0, 1], [20, -20]),
+    useTransform(ecoScroll, [0, 1], [-20, 20]),
     springConfig,
   );
   const ecoY3 = useSpring(
-    useTransform(ecoScroll, [0, 1], [60, -60]),
+    useTransform(ecoScroll, [0, 1], [40, -40]),
     springConfig,
   );
 
@@ -67,8 +60,6 @@ export function useLandingAnimations() {
     isMenuOpen,
     setIsMenuOpen,
     scrolled,
-    demoStatus,
-    setDemoStatus,
     heroRef,
     ecoRef,
     mockupY,

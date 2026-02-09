@@ -63,7 +63,7 @@ export default function Signup() {
     };
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-[#02040a] text-slate-900 dark:text-white flex items-center justify-center p-4 relative overflow-hidden font-['Outfit']">
+    <div className="min-h-screen bg-background-light dark:bg-[#02040a] text-slate-900 dark:text-white flex items-center justify-center p-4 relative overflow-hidden font-sans">
       {/* Simple background effect */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2" />

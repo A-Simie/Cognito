@@ -1,22 +1,51 @@
+import { lazy, Suspense } from "react";
 import { useLandingAnimations } from "@/lib/hooks/landing/useLandingAnimations";
 import { LandingBackground } from "@/components/layout/landing/LandingBackground";
 import { LandingHeader } from "@/components/layout/landing/LandingHeader";
 import { LandingHero } from "@/components/layout/landing/LandingHero";
-import { LandingProductMockup } from "@/components/layout/landing/LandingProductMockup";
-import { LandingEcosystem } from "@/components/layout/landing/LandingEcosystem";
-import { LandingFeatures } from "@/components/layout/landing/LandingFeatures";
-import { LandingTestimonial } from "@/components/layout/landing/LandingTestimonial";
-import { LandingWorkflow } from "@/components/layout/landing/LandingWorkflow";
-import { LandingCTA } from "@/components/layout/landing/LandingCTA";
-import { LandingFooter } from "@/components/layout/landing/LandingFooter";
+
+// Lazy load below-the-fold sections
+const LandingProductMockup = lazy(() =>
+  import("@/components/layout/landing/LandingProductMockup").then((m) => ({
+    default: m.LandingProductMockup,
+  })),
+);
+const LandingEcosystem = lazy(() =>
+  import("@/components/layout/landing/LandingEcosystem").then((m) => ({
+    default: m.LandingEcosystem,
+  })),
+);
+const LandingFeatures = lazy(() =>
+  import("@/components/layout/landing/LandingFeatures").then((m) => ({
+    default: m.LandingFeatures,
+  })),
+);
+const LandingTestimonial = lazy(() =>
+  import("@/components/layout/landing/LandingTestimonial").then((m) => ({
+    default: m.LandingTestimonial,
+  })),
+);
+const LandingWorkflow = lazy(() =>
+  import("@/components/layout/landing/LandingWorkflow").then((m) => ({
+    default: m.LandingWorkflow,
+  })),
+);
+const LandingCTA = lazy(() =>
+  import("@/components/layout/landing/LandingCTA").then((m) => ({
+    default: m.LandingCTA,
+  })),
+);
+const LandingFooter = lazy(() =>
+  import("@/components/layout/landing/LandingFooter").then((m) => ({
+    default: m.LandingFooter,
+  })),
+);
 
 export default function Landing() {
   const {
     isMenuOpen,
     setIsMenuOpen,
     scrolled,
-    demoStatus,
-    setDemoStatus,
     heroRef,
     ecoRef,
     mockupY,
@@ -29,7 +58,7 @@ export default function Landing() {
   } = useLandingAnimations();
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-[#02040c] text-slate-900 dark:text-white selection:bg-blue-500/30 font-['Outfit'] overflow-x-hidden relative">
+    <div className="min-h-screen bg-background-light dark:bg-[#02040c] text-slate-900 dark:text-white selection:bg-blue-500/30 font-sans overflow-x-hidden relative">
       <LandingBackground />
 
       <LandingHeader
@@ -41,30 +70,29 @@ export default function Landing() {
       <main className="relative z-10">
         <LandingHero heroRef={heroRef} opacity={opacity} scale={scale} />
 
-        <LandingProductMockup
-          mockupY={mockupY}
-          innerMockupY={innerMockupY}
-          demoStatus={demoStatus}
-          setDemoStatus={setDemoStatus}
-        />
+        <Suspense fallback={null}>
+          <LandingProductMockup mockupY={mockupY} innerMockupY={innerMockupY} />
 
-        <LandingEcosystem
-          ecoRef={ecoRef}
-          ecoY1={ecoY1}
-          ecoY2={ecoY2}
-          ecoY3={ecoY3}
-        />
+          <LandingEcosystem
+            ecoRef={ecoRef}
+            ecoY1={ecoY1}
+            ecoY2={ecoY2}
+            ecoY3={ecoY3}
+          />
 
-        <LandingFeatures />
+          <LandingFeatures />
 
-        <LandingTestimonial />
+          <LandingTestimonial />
 
-        <LandingWorkflow />
+          <LandingWorkflow />
 
-        <LandingCTA />
+          <LandingCTA />
+        </Suspense>
       </main>
 
-      <LandingFooter />
+      <Suspense fallback={null}>
+        <LandingFooter />
+      </Suspense>
     </div>
   );
 }

@@ -8,8 +8,6 @@ import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 interface LandingProductMockupProps {
   mockupY: MotionValue<number>;
   innerMockupY: MotionValue<number>;
-  demoStatus: DemoStatus;
-  setDemoStatus: (status: DemoStatus) => void;
 }
 
 interface Message {
@@ -145,9 +143,11 @@ const ActiveLearningCard = ({ demoStatus }: { demoStatus: DemoStatus }) => (
   <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-4 h-48 mb-4 shrink-0">
     <div className="rounded-2xl overflow-hidden relative group border border-slate-200 dark:border-white/10 shadow-lg transition-transform md:hover:scale-[1.02] md:active:scale-[1.02]">
       <img
-        src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800"
+        src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800&auto=compress"
         className="w-full h-full object-cover opacity-80"
         alt="AI Visualization"
+        loading="lazy"
+        decoding="async"
       />
       <div className="absolute inset-0 bg-blue-900/40 flex items-center justify-center">
         <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 flex items-center justify-center md:group-hover:scale-110 md:group-active:scale-110 transition-transform">
@@ -256,9 +256,8 @@ const InputArea = () => (
 export const LandingProductMockup = ({
   mockupY,
   innerMockupY,
-  demoStatus,
-  setDemoStatus,
 }: LandingProductMockupProps) => {
+  const [demoStatus, setDemoStatus] = useState<DemoStatus>("extracting");
   const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
 
   useEffect(() => {
@@ -300,8 +299,8 @@ export const LandingProductMockup = ({
       transition={{ duration: 1, ease: "easeOut" }}
       className="max-w-5xl mx-auto px-4 relative mt-10"
     >
-      <div className="relative p-1 bg-linear-to-b from-slate-200 dark:from-white/10 to-transparent rounded-3xl md:rounded-[40px] border w-fit mx-auto border-slate-100 dark:border-white/5 shadow-2xl">
-        <div className="bg-white/80 dark:bg-[#05070a]/90 backdrop-blur-3xl rounded-[28px] md:rounded-[36px] overflow-hidden border border-slate-200 dark:border-white/5 shadow-inner flex flex-col h-[400px] md:h-auto md:min-h-[500px] lg:aspect-16/10 lg:max-h-[80vh] relative">
+      <div className="relative p-1 bg-linear-to-b from-slate-200 dark:from-white/10 to-transparent rounded-3xl md:rounded-[40px] border w-full md:w-fit mx-auto border-slate-100 dark:border-white/5 shadow-2xl">
+        <div className="bg-white/80 dark:bg-[#05070a]/90 backdrop-blur-3xl rounded-[28px] md:rounded-[36px] overflow-hidden border border-slate-200 dark:border-white/5 shadow-inner flex flex-col h-[500px] md:h-auto md:min-h-[500px] lg:aspect-16/10 lg:max-h-[80vh] relative">
           <MacHeader />
 
           <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">

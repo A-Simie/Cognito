@@ -41,7 +41,7 @@ export const LandingWorkflow = () => {
                 duration: 0.8,
                 ease: "easeOut",
               }}
-              className="relative flex flex-col items-center group"
+              className="relative flex flex-col cursor-pointer items-center group"
             >
               <div className="relative mb-16">
                 <div className="absolute inset-0 bg-blue-600/20 blur-[60px] rounded-full md:scale-150 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-1000" />

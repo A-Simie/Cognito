@@ -17,6 +17,6 @@ export default defineConfig({
         secure: false,
       },
     },
-    allowedHosts: ["illogical-beach.outray.app"],
+    allowedHosts: [],
   },
 });

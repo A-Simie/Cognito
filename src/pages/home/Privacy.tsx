@@ -25,7 +25,7 @@ export default function Privacy() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-[#02040c] text-slate-900 dark:text-white font-['Outfit'] selection:bg-blue-500/30 overflow-x-hidden relative">
+    <div className="min-h-screen bg-background-light dark:bg-[#02040c] text-slate-900 dark:text-white font-sans selection:bg-blue-500/30 overflow-x-hidden relative">
       <LandingBackground />
 
       <LandingHeader
