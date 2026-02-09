@@ -57,23 +57,15 @@ export const LandingEcosystem = ({
           {/* Feature 1: Topic Tutor - Large Square */}
           <motion.div
             style={{ y: ecoY1 }}
-            initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{
               opacity: 1,
-              scale: isMobile ? [1, 1.02, 1] : 1,
-              y: isMobile ? [0, -8, 0] : 0,
-              rotateX: 0,
+              scale: 1,
             }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{
-              duration: 1,
-              ease: [0.16, 1, 0.3, 1],
-              scale: isMobile
-                ? { duration: 0.8, times: [0, 0.5, 1] }
-                : { duration: 1 },
-              y: isMobile
-                ? { duration: 0.8, times: [0, 0.5, 1] }
-                : { duration: 1 },
+              duration: 0.8,
+              ease: "easeOut",
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -99,20 +91,16 @@ export const LandingEcosystem = ({
           {/* Feature 2: YouTube Tutor - Wide */}
           <motion.div
             style={{ y: ecoY2 }}
-            initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{
               opacity: 1,
-              scale: isMobile ? [1, 1.02, 1] : 1,
-              y: isMobile ? [0, -8, 0] : 0,
-              rotateX: 0,
+              scale: 1,
             }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{
-              duration: 1,
+              duration: 0.8,
               delay: 0.1,
-              ease: [0.16, 1, 0.3, 1],
-              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
-              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              ease: "easeOut",
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -140,20 +128,16 @@ export const LandingEcosystem = ({
           {/* Feature 3: PDF Tutor - Small */}
           <motion.div
             style={{ y: ecoY3 }}
-            initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{
               opacity: 1,
-              scale: isMobile ? [1, 1.02, 1] : 1,
-              y: isMobile ? [0, -8, 0] : 0,
-              rotateX: 0,
+              scale: 1,
             }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{
-              duration: 1,
+              duration: 0.8,
               delay: 0.2,
-              ease: [0.16, 1, 0.3, 1],
-              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
-              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              ease: "easeOut",
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -175,12 +159,10 @@ export const LandingEcosystem = ({
 
           {/* Feature 4: Ajibade - Wide/Medium */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{
               opacity: 1,
-              scale: isMobile ? [1, 1.02, 1] : 1,
-              y: isMobile ? [0, -8, 0] : 0,
-              rotateX: 0,
+              scale: 1,
             }}
             viewport={{ once: true }}
             transition={{
@@ -213,20 +195,16 @@ export const LandingEcosystem = ({
 
           {/* Feature 5: Quizzes - Vertical */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{
               opacity: 1,
-              scale: isMobile ? [1, 1.02, 1] : 1,
-              y: isMobile ? [0, -8, 0] : 0,
-              rotateX: 0,
+              scale: 1,
             }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{
-              duration: 1,
+              duration: 0.8,
               delay: 0.1,
-              ease: [0.16, 1, 0.3, 1],
-              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
-              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              ease: "easeOut",
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -248,20 +226,16 @@ export const LandingEcosystem = ({
 
           {/* Feature 6: Analytics - Small Square */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{
               opacity: 1,
-              scale: isMobile ? [1, 1.02, 1] : 1,
-              y: isMobile ? [0, -8, 0] : 0,
-              rotateX: 0,
+              scale: 1,
             }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{
-              duration: 1,
+              duration: 0.8,
               delay: 0.2,
-              ease: [0.16, 1, 0.3, 1],
-              scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
-              y: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+              ease: "easeOut",
             }}
             whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -296,12 +270,10 @@ export const LandingEcosystem = ({
 
           {/* Feature 7: Live Sessions - Small Square */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 10 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{
               opacity: 1,
-              scale: isMobile ? [1, 1.02, 1] : 1,
-              y: isMobile ? [0, -8, 0] : 0,
-              rotateX: 0,
+              scale: 1,
             }}
             viewport={{ once: true }}
             transition={{

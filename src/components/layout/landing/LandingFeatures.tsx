@@ -2,10 +2,8 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import { FEATURES } from "@/lib/constants/landing";
-import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 
 export const LandingFeatures = () => {
-  const isMobile = useIsMobile();
   return (
     <section id="features" className="py-32 md:py-56 px-6 relative">
       <div className="max-w-7xl mx-auto">
@@ -25,17 +23,16 @@ export const LandingFeatures = () => {
           {FEATURES.map((feature, i) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{
                 opacity: 1,
                 y: 0,
-                scale: isMobile ? [1, 1.02, 1] : 1,
               }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{
-                duration: 0.5,
+                duration: 0.8,
                 delay: i * 0.1,
-                scale: isMobile ? { duration: 0.8, times: [0, 0.5, 1] } : {},
+                ease: "easeOut",
               }}
               className={cn(
                 "group relative p-10 rounded-3xl border border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/1 hover:bg-white dark:hover:bg-white/2 transition-colors duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl hover:border-blue-500/20 active:scale-95 active:bg-white dark:active:bg-white/2 active:shadow-2xl active:border-blue-500/20",

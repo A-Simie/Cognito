@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { useScroll, useTransform } from "framer-motion";
+import { useScroll, useTransform, useSpring } from "framer-motion";
 import { DemoStatus } from "@/lib/types/landing";
 
 export function useLandingAnimations() {
@@ -14,25 +14,49 @@ export function useLandingAnimations() {
     offset: ["start start", "end start"],
   });
 
-  const mockupY = useTransform(scrollYProgress, [0, 1], [0, -120]);
-  const innerMockupY = useTransform(scrollYProgress, [0, 1], [0, -40]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
+  // Spring configuration for smooth motion
+  const springConfig = {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  };
+
+  const rawMockupY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const rawInnerMockupY = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+  const rawScale = useTransform(scrollYProgress, [0, 0.4], [1, 0.95]);
+
+  const mockupY = useSpring(rawMockupY, springConfig);
+  const innerMockupY = useSpring(rawInnerMockupY, springConfig);
+  const opacity = useSpring(rawOpacity, springConfig);
+  const scale = useSpring(rawScale, springConfig);
 
   const { scrollYProgress: ecoScroll } = useScroll({
     target: ecoRef,
     offset: ["start end", "end start"],
   });
 
-  const ecoY1 = useTransform(ecoScroll, [0, 1], [0, -60]);
-  const ecoY2 = useTransform(ecoScroll, [0, 1], [0, -30]);
-  const ecoY3 = useTransform(ecoScroll, [0, 1], [0, -80]);
+  const ecoY1 = useSpring(
+    useTransform(ecoScroll, [0, 1], [40, -40]),
+    springConfig,
+  );
+  const ecoY2 = useSpring(
+    useTransform(ecoScroll, [0, 1], [20, -20]),
+    springConfig,
+  );
+  const ecoY3 = useSpring(
+    useTransform(ecoScroll, [0, 1], [60, -60]),
+    springConfig,
+  );
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 20;
+      if (isScrolled !== scrolled) setScrolled(isScrolled);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [scrolled]);
 
   return {
     isMenuOpen,

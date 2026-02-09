@@ -1,9 +1,7 @@
 import { motion } from "framer-motion";
 import { WORKFLOW_STEPS } from "@/lib/constants/landing";
-import { useIsMobile } from "@/lib/hooks/activity/useMediaQuery";
 
 export const LandingWorkflow = () => {
-  const isMobile = useIsMobile();
   return (
     <section
       id="workflow"
@@ -37,12 +35,11 @@ export const LandingWorkflow = () => {
               whileInView={{
                 opacity: 1,
                 y: 0,
-                scale: isMobile ? [1, 1.05, 1] : 1,
               }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{
                 duration: 0.8,
-                scale: isMobile ? { duration: 1, times: [0, 0.5, 1] } : {},
+                ease: "easeOut",
               }}
               className="relative flex flex-col items-center group"
             >
