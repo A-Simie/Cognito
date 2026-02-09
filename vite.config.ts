@@ -12,11 +12,16 @@ export default defineConfig({
   server: {
     proxy: {
       "/cognito": {
-        target: "http://localhost:8080",
+        target: "http://35.238.154.117",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/ws": {
+        target: "ws://35.238.154.117",
+        ws: true,
         changeOrigin: true,
         secure: false,
       },
     },
-    allowedHosts: [],
   },
 });
