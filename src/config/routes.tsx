@@ -17,15 +17,14 @@ const Terms = lazy(() => import("@/pages/home/Terms"));
 const YouTubeSelection = lazy(
   () => import("@/pages/teach-me/YouTubeSelection"),
 );
-const PDFSelection = lazy(
-  () => import("@/pages/teach-me/PDFSelection"),
-);
+const PDFSelection = lazy(() => import("@/pages/teach-me/PDFSelection"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 export interface AppRoute {
   path: string;
   element: ReactNode;
   requiresAuth?: boolean;
+  guestOnly?: boolean;
   title?: string;
 }
 
@@ -37,37 +36,44 @@ export const publicRoutes: AppRoute[] = [
     path: "/",
     element: <Landing />,
     title: "Home",
+    guestOnly: true,
   },
 
   {
     path: "/signup",
     element: <Signup />,
     title: "Sign Up",
+    guestOnly: true,
   },
   {
     path: "/login",
     element: <Login />,
     title: "Login",
+    guestOnly: true,
   },
   {
     path: "/verify-signup",
     element: <VerifyOtp type="signup" />,
     title: "Verify Signup",
+    guestOnly: true,
   },
   {
     path: "/verify-login",
     element: <VerifyOtp type="login" />,
     title: "Verify Login",
+    guestOnly: true,
   },
   {
     path: "/verify-otp",
     element: <VerifyOtp />,
     title: "Verify OTP",
+    guestOnly: true,
   },
   {
     path: "/forgot-password",
     element: <ForgotPassword />,
     title: "Forgot Password",
+    guestOnly: true,
   },
   {
     path: "/privacy",

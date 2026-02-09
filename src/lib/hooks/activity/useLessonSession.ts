@@ -302,7 +302,7 @@ export function useLessonSession() {
     isQuizActive,
     isCurrentlyPausing,
     isYouTubeMode,
-    setIsAudioFinished, // Added dependency
+    setIsAudioFinished,
   ]);
 
   useEffect(() => {

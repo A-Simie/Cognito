@@ -64,7 +64,7 @@ export default function App() {
                   key={route.path}
                   path={route.path}
                   element={
-                    route.path === "/" ? (
+                    route.guestOnly ? (
                       <RedirectIfAuthenticated>
                         {route.element}
                       </RedirectIfAuthenticated>

@@ -170,7 +170,7 @@ export default function Dashboard() {
               </div>
               <div className="shrink-0">
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 flex flex-col items-center justify-center min-w-[120px]">
-                  <span className="text-3xl font-bold">{goalProgress.toFixed(2)}%</span>
+                  <span className="text-3xl font-bold">{Number(goalProgress.toFixed(2))}</span>
                   <span className="text-xs text-blue-100 uppercase tracking-wide">
                     Weekly Goal ({stats?.weeklyGoalHours || "?"}h)
                   </span>
