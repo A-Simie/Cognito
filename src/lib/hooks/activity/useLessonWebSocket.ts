@@ -96,27 +96,19 @@ export function useLessonWebSocket(sessionId: string | null, isYouTubeMode: bool
                 }
                 break;
             case 'YOUTUBE_STEP': {
-                let quizzes = message.quizzesJson;
-                if (quizzes && typeof quizzes === 'string') {
-                    try {
-                        quizzes = JSON.parse(quizzes);
-                    } catch (e) {
-                        console.error("Failed to parse quizzesJson", e);
-                    }
+                const step = message.step;
+                if (step) {
+                    const stepWithId = {
+                        ...step,
+                        id: step.id || crypto.randomUUID(),
+                        // Ensure it's mapped to LessonStep interface if needed
+                        stepType: step.stepType || 'YOUTUBE'
+                    };
+                    lastStepIdRef.current = stepWithId.id;
+                    setSteps(prev => [...prev, stepWithId]);
+                    setClarificationResponse(null);
+                    setIsLoadingClarification(false);
                 }
-                const ytStep: LessonStep = {
-                    id: crypto.randomUUID(),
-                    stepType: 'YOUTUBE',
-                    stepPayload: {
-                        textToSpeak: message.textToSpeak,
-                        quizzesJson: quizzes,
-                        pauseAtSeconds: message.pauseAtSeconds,
-                    }
-                };
-                lastStepIdRef.current = ytStep.id;
-                setSteps(prev => [...prev, ytStep]);
-                setClarificationResponse(null);
-                setIsLoadingClarification(false);
                 break;
             }
             case 'YOUTUBE_STEP_LOADING':

@@ -23,6 +23,8 @@ interface LessonContentAreaProps {
   handlePostQuizResponse: (hasQuestion: boolean) => void;
   setIsQuizActive: (active: boolean) => void;
   timeUntilNextStep: number | null;
+  isAudioFinished: boolean;
+  isAjibadeSpeaking: boolean;
 }
 
 export function LessonContentArea({
@@ -48,6 +50,8 @@ export function LessonContentArea({
   handlePostQuizResponse,
   setIsQuizActive,
   timeUntilNextStep,
+  isAudioFinished,
+  isAjibadeSpeaking,
 }: LessonContentAreaProps) {
   return (
     <div className="w-full lg:w-2/3 xl:w-3/4 h-[55vh] lg:h-full bg-slate-100 dark:bg-slate-900 relative order-1 lg:order-1 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 transition-all duration-500 ease-in-out">
@@ -66,16 +70,18 @@ export function LessonContentArea({
 
       {(!isYouTubeMode ||
         clarificationResponse?.stepPayload?.canvasHtmlContent) && (
-        <iframe
-          key={(clarificationResponse || currentStep)?.id}
-          ref={iframeRef}
-          title="Interactive Sandbox"
-          sandbox="allow-scripts allow-same-origin"
-          className="w-full h-full border-0"
-        />
-      )}
+          <iframe
+            key={(clarificationResponse || currentStep)?.id}
+            ref={iframeRef}
+            title="Interactive Sandbox"
+            sandbox="allow-scripts allow-same-origin"
+            className="w-full h-full border-0"
+          />
+        )}
 
       {isQuizActive &&
+        isAudioFinished &&
+        !isAjibadeSpeaking &&
         (!isYouTubeMode || isCurrentlyPausing) &&
         !manualChatEnabled &&
         currentStep?.stepPayload?.quizzesJson && (
@@ -111,7 +117,7 @@ export function LessonContentArea({
                     ].options.map((option: string, idx: number) => {
                       const quiz =
                         currentStep.stepPayload?.quizzesJson?.[
-                          currentQuizIndex
+                        currentQuizIndex
                         ];
                       const isCorrect = idx === quiz?.correctAnswerIndex;
                       const isSelected = idx === selectedAnswerIndex;
@@ -202,7 +208,7 @@ export function LessonContentArea({
                     </span>{" "}
                     out of {currentStep?.stepPayload?.quizzesJson?.length || 0}.{" "}
                     {quizScore ===
-                    (currentStep?.stepPayload?.quizzesJson?.length || 0)
+                      (currentStep?.stepPayload?.quizzesJson?.length || 0)
                       ? "Great job!"
                       : "Keep practicing!"}
                   </p>

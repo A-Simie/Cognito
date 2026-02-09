@@ -29,6 +29,7 @@ export function LessonSession() {
     completionStats,
     introStatus,
     isCurrentlyPausing,
+    isAjibadeSpeaking,
     timeUntilNextStep,
 
     // Actions
@@ -161,12 +162,21 @@ export function LessonSession() {
                   playerRef.current &&
                   typeof playerRef.current.playVideo === "function"
                 ) {
-                  playerRef.current.mute();
-                  playerRef.current.playVideo();
-                  setTimeout(() => {
-                    playerRef.current.pauseVideo();
-                    playerRef.current.unMute();
-                  }, 100);
+                  try {
+                    playerRef.current.mute();
+                    playerRef.current.playVideo();
+                    setTimeout(() => {
+                      if (
+                        playerRef.current &&
+                        typeof playerRef.current.pauseVideo === "function"
+                      ) {
+                        playerRef.current.pauseVideo();
+                        playerRef.current.unMute();
+                      }
+                    }, 150);
+                  } catch (e) {
+                    console.warn("YouTube priming failed:", e);
+                  }
                 }
               }}
               className="w-full py-3.5 px-6 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold shadow-lg shadow-primary/25 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
@@ -255,6 +265,8 @@ export function LessonSession() {
           handlePostQuizResponse={handlePostQuizResponse}
           setIsQuizActive={setIsQuizActive}
           timeUntilNextStep={timeUntilNextStep}
+          isAudioFinished={isAudioFinished}
+          isAjibadeSpeaking={isAjibadeSpeaking}
         />
 
         <AjibadePanel
@@ -269,12 +281,12 @@ export function LessonSession() {
             isYouTubeMode && introStatus === "REQUESTED"
               ? `I am Ajibade, your AI tutor. We will be watching this lesson on ${unit?.title || "the topic"}. Just watch, and I will pause the video if I need to explain something or ask a question. Let's get started!`
               : clarificationResponse?.stepPayload?.textToSpeak ||
-                (isYouTubeMode &&
+              (isYouTubeMode &&
                 !isCurrentlyPausing &&
                 isPlaying &&
                 introStatus === "FINISHED"
-                  ? ""
-                  : currentStep?.stepPayload?.textToSpeak)
+                ? ""
+                : currentStep?.stepPayload?.textToSpeak)
           }
           onPlaybackEnded={handleAudioEnded}
           onAudioStatusChange={handleAudioStatusChange}

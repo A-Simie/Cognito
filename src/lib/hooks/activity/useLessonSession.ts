@@ -216,48 +216,75 @@ export function useLessonSession() {
     }
   }, [isYouTubeMode, hasStarted, isConnected, introStatus, unit, requestTTS]);
 
+  // The interval MUST run even if isQuizActive is true, 
+  // because we need to REACH the pause mark before showing the quiz.
   useEffect(() => {
-    if (isQuizActive || !currentStep?.id) return;
+    console.log(`[YouTube Monitor] Effect Triggered. currentStep: ${currentStep?.id}, isYouTubeMode: ${isYouTubeMode}`);
+    if (!currentStep?.id || !isYouTubeMode) return;
+
+    console.log(`[YouTube Monitor] Starting interval for step: ${currentStep.id}. Target: ${currentStep.stepPayload.pauseAtSeconds}s`);
 
     const interval = setInterval(() => {
       if (
         playerRef.current &&
         typeof playerRef.current.getCurrentTime === "function"
       ) {
-        if (!isPlayerReady) setIsPlayerReady(true);
+        if (!isPlayerReady) {
+          console.log("[YouTube Monitor] Player detected as ready!");
+          setIsPlayerReady(true);
+        }
 
         const currentTime = playerRef.current.getCurrentTime();
         const pauseTime = currentStep?.stepPayload?.pauseAtSeconds;
 
-        if (typeof pauseTime === "number" && pauseTime > currentTime) {
-          const remaining = pauseTime - currentTime;
-          setTimeUntilNextStep(remaining);
+        if (typeof pauseTime === "number") {
+          const diff = pauseTime - currentTime;
+          if (diff > 0) setTimeUntilNextStep(diff);
 
-          if (remaining < 1.5) {
+          // Log every ~1 second to identify if it's running without flooding
+          if (Math.floor(currentTime * 5) % 5 === 0) {
+            console.log(`[YouTube Monitor] Time: ${currentTime.toFixed(2)}s, Target: ${pauseTime}s, Diff: ${diff.toFixed(2)}s`);
+          }
+
+          // Robust check: Catch if we reached or slightly passed the mark (up to 1.5s tolerance)
+          if (currentTime >= pauseTime && currentTime < pauseTime + 1.5) {
             const state = playerRef.current.getPlayerState();
+            console.log(`[YouTube Monitor] TARGET MATCH! State: ${state}, isCurrentlyPausing: ${isCurrentlyPausing}`);
+
             // State 1 = Playing
             if (state === 1 && !isCurrentlyPausing) {
-              console.log(`🎯 Target reached: ${pauseTime}s. Pausing video...`);
+              console.log(`🎯 PAUSE TRIGGERED at ${currentTime.toFixed(2)}s (Target: ${pauseTime}s)`);
               setIsCurrentlyPausing(true);
               playerRef.current.pauseVideo();
               setTimeUntilNextStep(0);
+
+              // Reset audio state for this segment so the quiz waits
+              setIsAudioFinished(!currentStep.stepPayload.textToSpeak);
 
               if (
                 currentStep.stepPayload.textToSpeak &&
                 ttsRequestedForStep !== currentStep.id
               ) {
+                console.log(`[YouTube Monitor] Requesting TTS for step ${currentStep.id}`);
                 requestTTS(currentStep.stepPayload.textToSpeak);
                 setTtsRequestedForStep(currentStep.id);
               }
             }
+          } else if (currentTime > pauseTime + 1.5) {
+            // Already past the window
+            if (timeUntilNextStep !== null) setTimeUntilNextStep(null);
           }
-        } else {
-          setTimeUntilNextStep(null);
         }
+      } else {
+        // If no player, log occasionally
+        if (Math.random() < 0.05) console.log("[YouTube Monitor] Player not yet available in interval...");
       }
     }, 200);
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log(`[YouTube Monitor] Clearing interval for step: ${currentStep.id}`);
+      clearInterval(interval);
+    };
   }, [
     currentStep,
     requestTTS,
@@ -265,6 +292,8 @@ export function useLessonSession() {
     ttsRequestedForStep,
     isQuizActive,
     isCurrentlyPausing,
+    isYouTubeMode,
+    setIsAudioFinished // Added dependency
   ]);
 
   useEffect(() => {
@@ -318,6 +347,7 @@ export function useLessonSession() {
   const handleAudioStatusChange = useCallback(
     (isPlayingAudio: boolean) => {
       setIsAjibadeSpeaking(isPlayingAudio);
+      if (isPlayingAudio) setIsAudioFinished(false);
 
       if (
         !isYouTubeMode ||
