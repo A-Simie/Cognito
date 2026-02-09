@@ -1,5 +1,5 @@
 # Cognito Backend API Documentation
-## Complete Frontend Integration Guide
+## Complete Integration Guide
 
 **Production URL:** `https://ubiquitous-waffle-6qvpjpg6gwxhpw6-8080.app.github.dev`  
 **Base Path:** `/cognito/api/v1`  
