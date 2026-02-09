@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/cognito/:path*",
+      "destination": "http://35.238.154.117/cognito/:path*"
+    },
+    {
+      "source": "/ws/:path*",
+      "destination": "http://35.238.154.117/ws/:path*"
+    },
+    {
       "source": "/((?!api/.*).*)",
       "destination": "/index.html"
     }
