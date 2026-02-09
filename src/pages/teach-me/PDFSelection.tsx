@@ -32,7 +32,7 @@ export default function PDFSelection() {
         setFile(null);
         return;
       }
-      if (selectedFile.size > 1 * 1024 * 1024) {
+      if (selectedFile.size > 10 * 1024 * 1024) {
         setError("File is too large. Max size is 10MB.");
         addToast("File too large! Max size allowed is 10MB.", "error");
         setFile(null);
@@ -59,7 +59,7 @@ export default function PDFSelection() {
         setFile(null);
         return;
       }
-      if (droppedFile.size > 1 * 1024 * 1024) {
+      if (droppedFile.size > 10 * 1024 * 1024) {
         setError("File is too large. Max size is 10MB.");
         addToast("File too large! Max size allowed is 10MB.", "error");
         setFile(null);
