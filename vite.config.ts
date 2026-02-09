@@ -9,19 +9,4 @@ export default defineConfig({
       "@": "/src",
     },
   },
-  server: {
-    proxy: {
-      "/cognito": {
-        target: "http://35.238.154.117:8080",
-        changeOrigin: true,
-        secure: false,
-      },
-      "/ws": {
-        target: "ws://35.238.154.117:8080",
-        ws: true,
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
 });

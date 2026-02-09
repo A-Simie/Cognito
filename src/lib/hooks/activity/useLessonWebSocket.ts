@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 const WS_BASE_URL =
-  import.meta.env.VITE_WS_URL || "ws://akimy.me:8080/ws";
+  import.meta.env.VITE_WS_URL || "wss://api.cognito.software/ws";
 
 export interface LessonStep {
     id: string;
