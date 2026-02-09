@@ -1,160 +1,130 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowLeft, BookOpen, Lightbulb, Zap, Brain, GraduationCap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { MockBackend } from '@/services/mockBackend';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  ArrowLeft,
+  BookOpen,
+  Lightbulb,
+  Zap,
+  Brain,
+  GraduationCap,
+} from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 export function TopicSelection() {
-    const [topic, setTopic] = useState('');
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+  const [topic, setTopic] = useState("");
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e?: React.FormEvent) => {
-        e?.preventDefault();
-        if (!topic.trim() || loading) return;
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!topic.trim()) return;
 
-        setLoading(true);
-        try {
-            const newClass = await MockBackend.generatePlan(topic);
+    navigate("/teach-me/generating", { state: { topic } });
+  };
 
-            let displayTitle = newClass.title;
-            try {
-                if (typeof newClass.title === 'string' && newClass.title.startsWith('{')) {
-                    const parsed = JSON.parse(newClass.title);
-                    displayTitle = parsed.topicText || newClass.title;
-                }
-            } catch {
-                displayTitle = newClass.title;
-            }
+  const suggestions = [
+    { label: "Python Basics", icon: Zap },
+    { label: "React Hooks", icon: Lightbulb },
+    { label: "Quantum Physics", icon: Brain },
+    { label: "French Revolution", icon: BookOpen },
+  ];
 
-            localStorage.setItem('currentClassId', newClass.id.toString());
+  return (
+    <div className="min-h-screen w-full bg-linear-to-br from-slate-950 via-slate-900 to-blue-950 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-linear-to-r from-primary/5 to-blue-500/5 rounded-full blur-3xl" />
+      </div>
 
-            navigate('/classes', {
-                state: {
-                    newClassId: newClass.id,
-                    message: `"${displayTitle}" class created! Click to view curriculum.`
-                },
-                replace: true
-            });
-        } catch (error) {
-            console.error('Failed to create class:', error);
-            alert('Failed to create class. Please try again.');
-            setLoading(false);
-        }
-    };
+      {/* Back button */}
+      <div className="absolute top-6 left-6 z-50">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="group flex items-center cursor-pointer gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/70 hover:text-white transition-all duration-300 backdrop-blur-sm"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-medium">Back</span>
+        </button>
+      </div>
 
-    const suggestions = [
-        { label: 'Python Basics', icon: Zap },
-        { label: 'React Hooks', icon: Lightbulb },
-        { label: 'Quantum Physics', icon: Brain },
-        { label: 'French Revolution', icon: BookOpen },
-    ];
-
-    return (
-        <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 relative overflow-hidden">
-            {/* Background decorations */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/5 to-indigo-500/5 rounded-full blur-3xl" />
+      {/* Main content */}
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-20 relative z-10">
+        <div className="w-full max-w-2xl mx-auto">
+          {/* Header section */}
+          <div className="text-center mb-12 space-y-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-primary/20 to-blue-500/20 border border-primary/30 backdrop-blur-sm">
+              <GraduationCap className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-primary uppercase tracking-wide">
+                AI-Powered Learning
+              </span>
             </div>
 
-            {/* Back button */}
-            <div className="absolute top-6 left-6 z-10">
-                <button
-                    onClick={() => navigate('/dashboard', { replace: true })}
-                    className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/70 hover:text-white transition-all duration-300 backdrop-blur-sm"
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight">
+              What do you want to{" "}
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-blue-400">
+                learn?
+              </span>
+            </h1>
+
+            <p className="text-lg text-slate-400 max-w-md mx-auto">
+              Ajibade will craft a personalized curriculum tailored just for you
+            </p>
+          </div>
+
+          {/* Input section */}
+          <form onSubmit={handleSubmit} className="mb-10">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-linear-to-r from-primary to-blue-600 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
+              <div className="relative flex flex-col sm:flex-row gap-2 sm:gap-3 p-2 bg-slate-900/90 rounded-2xl border border-white/10 backdrop-blur-xl">
+                <input
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  placeholder="e.g. Introduction to Astrophysics..."
+                  className="w-full sm:flex-1 h-14 px-6 bg-transparent text-white text-lg placeholder-slate-500 focus:outline-none min-w-0"
+                  autoFocus
+                />
+                <Button
+                  type="submit"
+                  disabled={!topic.trim()}
+                  size="lg"
+                  className="w-full sm:w-auto h-14 px-8 rounded-xl bg-linear-to-r from-primary to-blue-600 hover:from-primary-dark hover:to-blue-700 text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 shrink-0"
                 >
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                    <span className="text-sm font-medium">Back</span>
+                  <>
+                    Teach Me
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                </Button>
+              </div>
+            </div>
+          </form>
+
+          {/* Suggestions section */}
+          <div className="space-y-4">
+            <p className="text-center text-sm text-slate-500 uppercase tracking-wider font-medium">
+              Popular topics
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {suggestions.map(({ label, icon: Icon }) => (
+                <button
+                  key={label}
+                  onClick={() => setTopic(label)}
+                  className="group flex items-center cursor-pointer gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/50 text-slate-300 hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/10"
+                >
+                  <Icon className="w-4 h-4 text-primary/70 group-hover:text-primary transition-colors" />
+                  <span className="font-medium">{label}</span>
                 </button>
+              ))}
             </div>
+          </div>
 
-            {/* Main content */}
-            <div className="min-h-screen flex flex-col items-center justify-center px-4 py-20 relative z-10">
-                <div className="w-full max-w-2xl mx-auto">
-                    {/* Header section */}
-                    <div className="text-center mb-12 space-y-4">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-indigo-500/20 border border-primary/30 backdrop-blur-sm">
-                            <GraduationCap className="w-4 h-4 text-primary" />
-                            <span className="text-sm font-semibold text-primary uppercase tracking-wide">
-                                AI-Powered Learning
-                            </span>
-                        </div>
-                        
-                        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight">
-                            What do you want to{' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-400">
-                                learn?
-                            </span>
-                        </h1>
-                        
-                        <p className="text-lg text-slate-400 max-w-md mx-auto">
-                            Ajibade will craft a personalized curriculum tailored just for you
-                        </p>
-                    </div>
-
-                    {/* Input section */}
-                    <form onSubmit={handleSubmit} className="mb-10">
-                        <div className="relative group">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-primary to-indigo-500 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
-                            <div className="relative flex flex-col sm:flex-row gap-3 p-2 bg-slate-900/90 rounded-2xl border border-white/10 backdrop-blur-xl">
-                                <input
-                                    value={topic}
-                                    onChange={(e) => setTopic(e.target.value)}
-                                    placeholder="e.g. Introduction to Astrophysics..."
-                                    className="flex-1 h-14 px-6 bg-transparent text-white text-lg placeholder-slate-500 focus:outline-none"
-                                    autoFocus
-                                />
-                                <Button
-                                    type="submit"
-                                    disabled={!topic.trim() || loading}
-                                    size="lg"
-                                    className="h-14 px-8 rounded-xl bg-gradient-to-r from-primary to-indigo-500 hover:from-primary-dark hover:to-indigo-600 text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            Creating...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Teach Me
-                                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                        </>
-                                    )}
-                                </Button>
-                            </div>
-                        </div>
-                    </form>
-
-                    {/* Suggestions section */}
-                    <div className="space-y-4">
-                        <p className="text-center text-sm text-slate-500 uppercase tracking-wider font-medium">
-                            Popular topics
-                        </p>
-                        <div className="flex flex-wrap gap-3 justify-center">
-                            {suggestions.map(({ label, icon: Icon }) => (
-                                <button
-                                    key={label}
-                                    onClick={() => setTopic(label)}
-                                    className="group flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/50 text-slate-300 hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/10"
-                                >
-                                    <Icon className="w-4 h-4 text-primary/70 group-hover:text-primary transition-colors" />
-                                    <span className="font-medium">{label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Bottom info */}
-                    <div className="mt-16 text-center">
-                        <p className="text-sm text-slate-500">
-                            ✨ Powered by advanced AI to create structured learning paths
-                        </p>
-                    </div>
-                </div>
-            </div>
+          {/* Bottom info */}
+          <div className="mt-16 text-center">
+            <p className="text-sm text-slate-500">Powered by Cognito.</p>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

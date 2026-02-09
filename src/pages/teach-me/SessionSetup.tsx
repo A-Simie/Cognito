@@ -1,68 +1,74 @@
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { MockBackend } from '@/services/mockBackend';
-import { LoadingScreen } from '@/components/lesson/LoadingScreen';
+import { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { classService } from "@/lib/services/classService";
+import { LoadingScreen } from "@/components/lesson/LoadingScreen";
+import { useToastStore } from "@/lib/store/toastStore";
 
 export function SessionSetup() {
-    const { state } = useLocation();
-    const navigate = useNavigate();
-    const [loadingProgress, setLoadingProgress] = useState(5);
-    const [loadingMessage, setLoadingMessage] = useState('Initializing session...');
+  const hasStarted = useRef(false);
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const [loadingProgress, setLoadingProgress] = useState(5);
+  const [loadingMessage, setLoadingMessage] = useState(
+    "Initializing session...",
+  );
+  const { addToast } = useToastStore();
 
-    useEffect(() => {
-        const startLesson = async () => {
-            if (!state?.unit) {
-                navigate('/teach-me/class/units');
-                return;
-            }
+  useEffect(() => {
+    if (hasStarted.current) return;
+    hasStarted.current = true;
 
-            const classId = parseInt(localStorage.getItem('currentClassId') || '0');
-            const unitId = state.unit.id;
+    const startLesson = async () => {
+      if (!state?.unit) {
+        navigate("/teach-me/class/units");
+        return;
+      }
 
-            if (!unitId || !classId) {
-                navigate('/classes');
-                return;
-            }
+      const classId = parseInt(localStorage.getItem("currentClassId") || "0");
+      const unitIndex = Math.max(0, state.unit.unitOrder - 1);
 
-            try {
-                // Show initial progress  
-                setLoadingProgress(5);
-                setLoadingMessage('Initializing session...');
+      if (unitIndex === undefined || !classId) {
+        navigate("/classes");
+        return;
+      }
 
-                // Small delay for UX
-                await new Promise(resolve => setTimeout(resolve, 300));
+      try {
+        setLoadingProgress(5);
+        setLoadingMessage("Initializing session...");
 
-                setLoadingProgress(30);
-                setLoadingMessage('Creating your learning session...');
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
-                // Start lesson - mock backend creates session
-                const response = await MockBackend.startLesson(classId, unitId);
+        setLoadingProgress(30);
+        setLoadingMessage("Creating your learning session...");
 
-                setLoadingProgress(70);
-                setLoadingMessage('Loading lesson content...');
+        const response = await classService.startLesson(classId, unitIndex);
 
-                const sessionId = response.sessionId;
-                if (!sessionId) {
-                    throw new Error('No session ID returned');
-                }
+        setLoadingProgress(70);
+        setLoadingMessage("Loading lesson content...");
 
-                setLoadingProgress(100);
-                setLoadingMessage('Ready! Starting lesson...');
+        const sessionId = response.sessionId;
+        if (!sessionId) {
+          throw new Error("No session ID returned");
+        }
 
-                // Brief pause before navigation for smooth transition
-                await new Promise(resolve => setTimeout(resolve, 500));
+        setLoadingProgress(100);
+        setLoadingMessage("Ready! Starting lesson...");
 
-                // Navigate to lesson session
-                navigate(`/teach-me/session/${sessionId}`, { replace: true });
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-            } catch (error) {
-                console.error('Failed to start lesson:', error);
-                navigate('/teach-me/class/units');
-            }
-        };
+        navigate(`/teach-me/session/${sessionId}`, {
+          replace: true,
+          state: { unit: state.unit, fromSetup: true },
+        });
+      } catch (error) {
+        hasStarted.current = false;
+        addToast("Failed to start lesson session. Please try again.", "error");
+        navigate("/teach-me/class/units");
+      }
+    };
 
-        startLesson();
-    }, [state, navigate]);
+    startLesson();
+  }, [state, navigate, addToast]);
 
-    return <LoadingScreen progress={loadingProgress} message={loadingMessage} />;
+  return <LoadingScreen progress={loadingProgress} message={loadingMessage} />;
 }
