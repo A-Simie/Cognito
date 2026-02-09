@@ -2,6 +2,9 @@
 
 An AI-powered educational platform for self-directed learners, featuring interactive learning modes, an AI tutor named Ajibade, and comprehensive progress tracking.
 
+App Preview:
+![App Preview](./public/opengraph-image.png)
+
 ## ✨ Features
 
 ### 🎓 Learning Modes
