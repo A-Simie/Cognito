@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
-const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'wss://ubiquitous-waffle-6qvpjpg6gwxhpw6-8080.app.github.dev/ws';
+const WS_BASE_URL =
+  import.meta.env.VITE_WS_URL || "ws://akimy.me:8080/ws";
 
 export interface LessonStep {
     id: string;

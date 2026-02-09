@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useToastStore, ToastType } from "@/lib/store/toastStore";
 import { CheckCircle, XCircle, AlertCircle, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
+import { forwardRef } from "react";
 
 const icons = {
   success: CheckCircle,
@@ -17,20 +18,16 @@ const colors = {
   info: "bg-blue-500/10 border-blue-500/20 text-blue-500",
 };
 
-const ToastItem = ({
-  id,
-  message,
-  type,
-}: {
-  id: string;
-  message: string;
-  type: ToastType;
-}) => {
+const ToastItem =forwardRef<
+  HTMLDivElement, 
+  { id: string; message: string; type: ToastType }
+>(({id, message, type}, ref) => {
   const { removeToast } = useToastStore();
   const Icon = icons[type];
 
   return (
     <motion.div
+      ref={ref}
       layout
       initial={{ opacity: 0, y: -20, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -53,7 +50,7 @@ const ToastItem = ({
       </button>
     </motion.div>
   );
-};
+});
 
 export const ToastContainer = () => {
   const { toasts } = useToastStore();

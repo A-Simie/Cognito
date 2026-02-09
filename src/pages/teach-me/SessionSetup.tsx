@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { classService } from "@/lib/services/classService";
 import { LoadingScreen } from "@/components/lesson/LoadingScreen";
 import { useToastStore } from "@/lib/store/toastStore";
 
 export function SessionSetup() {
+  const hasStarted = useRef(false);
   const { state } = useLocation();
   const navigate = useNavigate();
   const [loadingProgress, setLoadingProgress] = useState(5);
@@ -14,6 +15,9 @@ export function SessionSetup() {
   const { addToast } = useToastStore();
 
   useEffect(() => {
+    if (hasStarted.current) return;
+    hasStarted.current = true;
+
     const startLesson = async () => {
       if (!state?.unit) {
         navigate("/teach-me/class/units");
@@ -54,16 +58,17 @@ export function SessionSetup() {
 
         navigate(`/teach-me/session/${sessionId}`, {
           replace: true,
-          state: { unit: state.unit },
+          state: { unit: state.unit, fromSetup: true },
         });
       } catch (error) {
+        hasStarted.current = false;
         addToast("Failed to start lesson session. Please try again.", "error");
         navigate("/teach-me/class/units");
       }
     };
 
     startLesson();
-  }, [state, navigate]);
+  }, [state, navigate, addToast]);
 
   return <LoadingScreen progress={loadingProgress} message={loadingMessage} />;
 }
