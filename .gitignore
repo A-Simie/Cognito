@@ -43,7 +43,7 @@ coverage
 # Misc
 *.pem
 
-# Reference designs (not needed in repo)
+# Reference designs
 stitch_ajibade_youtube_tutor_interface
 
 # Lock files (optional - uncomment if you want to ignore)
