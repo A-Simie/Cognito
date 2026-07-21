@@ -2,8 +2,6 @@
 
 > Turn any topic, YouTube video, or PDF into an interactive lesson with a personal AI tutor.
 
-**Live App**: [cognito.software](https://cognito.software)
-
 ![Cognito Preview](./public/opengraph-image.png)
 
 ## What is Cognito?
@@ -31,7 +29,7 @@ GPT-5.6 analyzes the learner's real data and returns:
 - **Next Topics to Learn** — Contextual suggestions based on what the learner has studied
 - **Motivational Note** — A personalized message from Ajibade
 
-The analysis references the learner's actual classes by name and tailors every recommendation to their specific data. Nothing is generic.
+The analysis references the learner's actual classes by name and tailors every recommendation to their specific data. Nothing is generic. Insights are generated on demand, each time a learner requests them.
 
 **Architecture:**
 
@@ -42,18 +40,37 @@ React Frontend → Cognito Backend `/study-insights` → OpenAI GPT-5.6 API
 The frontend's shared Axios client attaches the learner's JWT automatically. OpenAI credentials, prompt construction, learner-data lookup, and GPT-5.6 calls are all owned by the backend.
 
 **Key files:**
+
 - `src/lib/services/apiClient.ts` — Authenticated Axios client used for backend requests
 - `src/lib/services/insightsService.ts` — Calls `POST /study-insights` with no client-side payload
 - `src/lib/hooks/useInsights.ts` — React Query mutation hook
 - `src/pages/dashboard/Insights.tsx` — Insights dashboard page
 
+### Evidence of Submission-Period Work
+
+New during the Submission Period (July 13–21, 2026), with no commit history before this submission:
+
+- `src/lib/services/insightsService.ts`
+- `src/lib/hooks/useInsights.ts`
+- `src/pages/dashboard/Insights.tsx`
+
+Reviewers can verify these files independently:
+
+```bash
+git log --follow --date=iso-strict --format='%h %ad %s' -- src/lib/services/insightsService.ts
+```
+
+Everything else in this repository — routing, auth flow, lesson session UI, WebSocket/audio handling, design system — predates this submission and is included only as context for how the new feature fits into the existing app.
+
 ### Codex Usage
 
-OpenAI Codex was used as the primary development tool during Build Week to:
+OpenAI Codex was used as the primary development tool for this feature during Build Week. It:
 
-- Architect and implement the AI Study Insights feature (backend-integrated service layer, React hook, and UI page)
-- Maintain type safety and consistency with the existing codebase patterns
-- Define the frontend contract for GPT-5.6's structured insight response
+- Architected and implemented the Study Insights service layer, the React Query hook, and the dashboard page listed above
+- Matched the frontend's TypeScript contract exactly to the backend's `StudyInsightsResponse` DTO so the two repos stay in sync
+- Maintained type safety and consistency with the existing codebase's patterns (Zustand stores, the shared Axios client, centralized route config)
+
+The corresponding backend work — including a Codex-led self-audit that caught a response-schema mismatch and an overstated claim in an earlier documentation draft — is documented in detail in the [Cognito backend README](https://github.com/Akeem1955/CognitoBackend/blob/main/README.md#how-codex-helped-build-it).
 
 ---
 
@@ -61,11 +78,11 @@ OpenAI Codex was used as the primary development tool during Build Week to:
 
 ### Multi-Modal Learning
 
-| Mode | How It Works |
-|---|---|
-| **Topic Tutor** | Type any subject. Cognito generates a structured curriculum with multiple lesson units. |
+| Mode              | How It Works                                                                                                                 |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Topic Tutor**   | Type any subject. Cognito generates a structured curriculum with multiple lesson units.                                      |
 | **YouTube Tutor** | Paste a YouTube URL. The video is segmented into timed lesson chunks with AI-guided pause points, explanations, and quizzes. |
-| **PDF Tutor** | Upload a document. The AI breaks it into digestible lesson units with guided explanations. |
+| **PDF Tutor**     | Upload a document. The AI breaks it into digestible lesson units with guided explanations.                                   |
 
 ### Ajibade AI Tutor
 
@@ -78,7 +95,7 @@ Ajibade is the central learning experience. During any lesson session:
 
 ### AI Study Insights (GPT-5.6)
 
-A dedicated analytics page (`/insights`) where GPT-5.6 reviews your entire learning history and generates a personalized study strategy. Includes strengths analysis, improvement areas, prioritized recommendations, a weekly plan, and topic suggestions.
+A dedicated analytics page (`/insights`) where GPT-5.6 reviews your learning history and generates a personalized study strategy, on demand. Includes strengths analysis, improvement areas, prioritized recommendations, a weekly plan, and topic suggestions.
 
 ### Progress Tracking
 
@@ -93,6 +110,7 @@ A dedicated analytics page (`/insights`) where GPT-5.6 reviews your entire learn
 ## Tech Stack
 
 ### Frontend
+
 - **React 18** + **TypeScript**
 - **Vite 5** — Dev server and build tool
 - **Tailwind CSS 4** — Utility-first styling with Lightning CSS
@@ -103,11 +121,13 @@ A dedicated analytics page (`/insights`) where GPT-5.6 reviews your entire learn
 - **Zod** — Runtime validation
 
 ### Backend Integration
+
 - **RESTful API** — Authentication, class management, user profiles
 - **WebSocket** — Real-time bidirectional lesson sessions
 - **Audio streaming** — Chunked OGG/Opus delivery for voice synthesis
 
 ### AI / Backend
+
 - **OpenAI GPT-5.6** — Personalized study insights generated by the Cognito backend
 - **Authenticated REST endpoint** — `POST /cognito/api/v1/study-insights` retrieves learner context server-side
 
@@ -183,6 +203,7 @@ root/
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm
 
@@ -217,21 +238,21 @@ npm run preview    # Preview production build
 
 ## Routes
 
-| Path | Description | Auth |
-|---|---|---|
-| `/` | Landing page | No |
-| `/login` | User login | No |
-| `/signup` | User registration | No |
-| `/verify-otp` | OTP verification | No |
-| `/forgot-password` | Password reset | No |
-| `/dashboard` | Main dashboard | Yes |
-| `/classes` | All classes | Yes |
-| `/teach-me/*` | Create topic/YouTube/PDF class | Yes |
-| `/teach-me/class/units` | View class units | Yes |
-| `/insights` | AI Study Insights (GPT-5.6) | Yes |
-| `/settings` | User settings | Yes |
-| `/quiz` | Quiz mode | Yes |
-| `/community` | Community | Yes |
+| Path                    | Description                    | Auth |
+| ----------------------- | ------------------------------ | ---- |
+| `/`                     | Landing page                   | No   |
+| `/login`                | User login                     | No   |
+| `/signup`               | User registration              | No   |
+| `/verify-otp`           | OTP verification               | No   |
+| `/forgot-password`      | Password reset                 | No   |
+| `/dashboard`            | Main dashboard                 | Yes  |
+| `/classes`              | All classes                    | Yes  |
+| `/teach-me/*`           | Create topic/YouTube/PDF class | Yes  |
+| `/teach-me/class/units` | View class units               | Yes  |
+| `/insights`             | AI Study Insights (GPT-5.6)    | Yes  |
+| `/settings`             | User settings                  | Yes  |
+| `/quiz`                 | Quiz mode                      | Yes  |
+| `/community`            | Community                      | Yes  |
 
 ---
 
@@ -257,6 +278,12 @@ JWT tokens stored in HTTP-only cookies. Automatic session management with interc
 
 ---
 
+## Third-Party Integrations & Licensing
+
+This frontend does not hold any third-party AI credentials directly. **OpenAI GPT-5.6** and **Google Gemini** are called exclusively from the Cognito backend, under backend-owned API keys, subject to OpenAI's Usage Policies/Business Terms and Google's API Terms of Service respectively. YouTube videos are referenced only via user-supplied URLs for the authenticated learner's own educational use; no video content is downloaded in bulk, redistributed, or made public.
+
+---
+
 ## Built With
 
 - React · TypeScript · Vite · Tailwind CSS 4 · Framer Motion
@@ -269,11 +296,11 @@ JWT tokens stored in HTTP-only cookies. Automatic session management with interc
 
 ## Contributors
 
-| Contributor | GitHub |
-|---|---|
-| **Mosimiloluwa Adebisi** | [@A-Simie](https://github.com/A-Simie) |
-| **Amina** | [@aminatukekere](https://github.com/aminatukekere) |
-| **Rahmannugar** | [@Rahmannugar](https://github.com/Rahmannugar) |
+| Contributor              | GitHub                                             |
+| ------------------------ | -------------------------------------------------- |
+| **Mosimiloluwa Adebisi** | [@A-Simie](https://github.com/A-Simie)             |
+| **Amina**                | [@aminatukekere](https://github.com/aminatukekere) |
+| **Rahmannugar**          | [@Rahmannugar](https://github.com/Rahmannugar)     |
 
 ---
 
